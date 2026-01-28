@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_delivery_document_inherit" inherit_id="stock.report_delivery_document">
+        <xpath expr="//div[@class='page']" position="before">
+            <t t-set="address"></t>
+            <div class="row mb-4">
+                <div class="col-12">
+                    <span><strong>Razón Social: </strong> <t t-esc="o.partner_id.display_name"/></span><br/>
+                    <span><strong>Domicilio: </strong> <t t-esc="o.partner_id.street"/></span><br/>
+                    <span><strong>Ubicación: </strong> <t t-esc="o.partner_id.city"/></span><br/>
+                    <span><strong>Condición de venta: </strong></span> <span t-field="o.move_type"/><br/>
+                    <span><strong>DNI: </strong> <t t-esc="o.partner_id.vat"/></span><br/>
+                    <span><strong>Condición de IVA: </strong> <t t-esc="o.partner_id.l10n_ar_afip_responsibility_type_id.display_name"/></span><br/>
+                </div>
+            </div>
+        </xpath>
+        <xpath expr="//table[@class='table table-sm']//tbody//tr//td[1]" position="replace">
+            <td name="td_display_name">
+                <t t-if="not move.description_picking">
+                    <span t-field="move.product_id"/>
+                </t>
+                <t t-else="">
+                    <span t-field="move.description_picking"/>
+                </t>
+            </td>
+        </xpath>
+        <xpath expr="//span[@t-field='move.product_uom']" position="replace"/>
+        <xpath expr="//span[@t-field='bo_line.product_uom']" position="replace"/>
+        <xpath expr="//th[@name='th_sm_quantity']" position="replace"/>
+        <xpath expr="//table[@class='table table-sm']//tbody//tr//td[3]" position="replace"/>
+        <xpath expr="//th[@name='th_sm_product']//strong" position="replace">
+            <strong>Descripción</strong>
+        </xpath>
+        <xpath expr="//th[@name='th_sml_product']//strong" position="replace">
+            <strong>Descripción</strong>
+        </xpath>
+        <xpath expr="//th[@name='th_sm_ordered']//strong" position="replace">
+            <strong>Cantidad</strong>
+        </xpath>
+        <xpath expr="//th[@name='th_sml_qty_ordered']//strong" position="replace">
+            <strong>Cantidad</strong>
+        </xpath>
+        <xpath expr="//th[@name='th_sml_quantity']" position="replace">
+            <th name="th_sml_quantity" class="text-center" t-if="has_serial_number">
+                <strong>Cantidad</strong>
+            </th>
+        </xpath>
+        <xpath expr="//th[@name='th_sm_product']" position="before">
+            <th name="th_code" class="text-left" t-att-style="'display: none;' if without_sku else ''">Código</th>
+        </xpath>
+        <xpath expr="//th[@name='th_sml_product']" position="before">
+            <th name="th_code" class="text-left" t-att-style="'display: none;' if without_sku else ''">Código</th>
+        </xpath>
+        <xpath expr="//table[@class='table table-sm']//tbody//tr//td[1]" position="before">
+            <td name="td_code" class="text-left" t-att-style="'display: none;' if without_sku else ''">
+                <span t-field="move.product_id.default_code"/>
+            </td>
+        </xpath>
+        <xpath expr="//table[last()]" position="after">
+            <div class="row mt-4 mb-4">
+                <div class="col-12">
+                    <div class="mt-2 mb-2">
+                        <span>Cantidad de Bultos:</span>
+                    </div>
+                    <div class="mt-2 mb-2">
+                        <span>VPS:</span>
+                    </div>
+                    <hr/>
+                    <div class="mt-2 mb-2">
+                        <span><strong>Transporte:</strong></span>
+                    </div>
+                    <hr/>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="stock_report_delivery_aggregated_move_lines_inherit" inherit_id="stock.stock_report_delivery_aggregated_move_lines">
+        <xpath expr="//td[@name='move_line_aggregated_qty_ordered']//span[2]" position="replace"/>
+        <xpath expr="//td[@name='move_line_aggregated_qty_done']" position="replace"/>
+        <xpath expr="//td//span" position="replace">
+            <span t-esc="aggregated_lines[line]['product'].name" t-if="not aggregated_lines[line]['description']"/>
+        </xpath>
+        <xpath expr="//td" position="before">
+            <td name="td_code" class="text-left" t-att-style="'display: none;' if without_sku else ''">
+                <span t-esc="aggregated_lines[line]['product'].default_code"/>
+            </td>
+        </xpath>
+    </template>
+    <template id="stock_report_delivery_has_serial_move_line_inherit" inherit_id="stock.stock_report_delivery_has_serial_move_line">
+        <xpath expr="//td[1]" position="replace">
+            <td t-att-style="'display: none;' if without_sku else ''">
+                <span t-field="move_line.product_id.default_code"/>
+            </td>
+            <td>
+                <span t-field="move_line.product_id.name"/>
+            </td>
+        </xpath>
+    </template>
+
+    <template id="report_stockpicking_without_sku">
+        <t t-call="web.html_container">
+            <t t-set="without_sku" t-value="True"/>
+            <t t-foreach="docs" t-as="o">
+                <t t-call="wall_report_custom.report_delivery_document_inherit" t-lang="o.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+
+</odoo>

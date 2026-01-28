@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="custom_header_clean" priority="1">
+        <!-- requirement: header without content -->
+    </template>
+
+    <template id="report_invoice_document_inherit" inherit_id="account.report_invoice_document">
+        <xpath expr="//div[@class='page']" position="before">
+            <t t-if="not o.journal_id.l10n_latam_use_documents">
+                <t t-set="custom_header" t-value="'wall_report_custom.custom_header_clean'"/>
+            </t>
+            <t t-set="address"></t>
+            <div class="row mb-4">
+                <div class="col-6">
+                    <span><strong>Razón Social: </strong> <t t-esc="o.partner_id.display_name"/></span><br/>
+                    <span><strong>Domicilio: </strong> <t t-esc="o.partner_id.street"/></span><br/>
+                    <span><strong>Ubicación: </strong> <t t-esc="o.partner_id.city"/></span><br/>
+                    <span><strong>Condición de venta: </strong></span> <span t-field="o.move_type"/><br/>
+                </div>
+                <div class="col-6 text-right">
+                    <span><strong>Fecha Vencimiento: </strong> <span t-field="o.invoice_date_due"/></span><br/>
+                    <span><strong>Cuit: </strong> <t t-esc="o.partner_id.vat"/></span><br/>
+                    <span><strong>Cond. IVA: </strong> <t t-esc="o.partner_id.l10n_ar_afip_responsibility_type_id.display_name"/></span><br/>
+                </div>
+            </div>
+        </xpath>
+        <xpath expr="//h2" position="attributes">
+            <attribute name="t-attf-style">
+                {{'display: none !important;'}}
+            </attribute>
+        </xpath>
+        <xpath expr="//div[@id='informations']" position="attributes">
+            <attribute name="t-attf-style">
+                {{'display: none !important;'}}
+            </attribute>
+        </xpath>
+        <xpath expr="//th[@name='th_taxes']" position="replace">
+            <th name="th_taxes" t-attf-class="text-center {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}"><span>IVA</span></th>
+        </xpath>
+        <xpath expr="//tbody[@class='invoice_tbody']//t//tr//t[@name='account_invoice_line_accountable']//td[5]" position="replace">
+            <td t-attf-class="text-center {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
+                <span t-esc="', '.join(map(lambda x: (x.description or x.name), line.tax_ids))" id="line_tax_ids"/>
+            </td>
+        </xpath>
+        <xpath expr="//th[@name='th_price_unit']" position="replace"/>
+        <xpath expr="//th[@name='th_taxes']" position="after">
+            <th name="th_price_unit" t-attf-class="text-left {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
+                <span>Bonif</span>
+            </th>
+        </xpath>
+        <xpath expr="//td[@t-if='display_discount']" position="replace"/>
+        <xpath expr="//td[@class='text-right o_price_total']" position="before">
+            <td t-attf-class="text-left {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
+                <span class="text-nowrap" t-field="line.discount"/>
+                <span> %</span>
+            </td>
+        </xpath>
+        <xpath expr="//th[@name='th_description']" position="before">
+            <th name="th_code" class="text-left" t-att-style="'display: none;' if without_sku else ''"><span>Código</span></th>
+        </xpath>
+        <xpath expr="//td[@name='account_invoice_line_name']" position="before">
+            <td name="account_invoice_line_code" t-att-style="'display: none;' if without_sku else ''">
+                <span t-field="line.product_id.default_code"/>
+            </td>
+        </xpath>
+        <xpath expr="//td[@name='account_invoice_line_name']//span" position="attributes">
+            <attribute name="t-field" value="line.product_id.name">line.product_id.name</attribute>
+        </xpath>
+    </template>
+
+    <template id="report_invoice_document_l10n_ar_inherit" inherit_id="l10n_ar.report_invoice_document">
+        <xpath expr="//div[@id='informations']" position="attributes">
+            <attribute name="t-attf-style">
+                {{'display: none !important;'}}
+            </attribute>
+        </xpath>
+        <xpath expr="//th[@name='th_taxes']" position="replace">
+            <th name="th_taxes" t-attf-class="text-center {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}"><span>IVA</span></th>
+        </xpath>
+        <xpath expr="//th[@name='th_subtotal']" position="replace">
+            <th name="th_subtotal" class="text-right">
+                <span>Subtotal</span>
+            </th>
+        </xpath>
+        <xpath expr="//span[@id='line_tax_ids']/.." position="replace">
+            <td t-attf-class="text-left {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
+                <span t-esc="', '.join(map(lambda x: (x.description or x.name), line.tax_ids))" id="line_tax_ids"/>
+            </td>
+        </xpath>
+    </template>
+
+    <template id="tax_groups_totals_inherit" inherit_id="account.tax_groups_totals">
+        <xpath expr="//t//tr//t//td//span[1]" position="replace">
+            <t t-set="tax_group_name_split" t-value="amount_by_group['tax_group_name'].split(' ')"/>
+            <t t-set="tax_group_name_percent" t-value="tax_group_name_split[1] if (len(tax_group_name_split) > 1) and ('%' in tax_group_name_split[1]) else amount_by_group['tax_group_name']"/>
+            <span t-esc="tax_group_name_percent"/>
+        </xpath>
+    </template>
+
+    <template id="stock_account_report_invoice_document_inherit" inherit_id="stock_account.stock_account_report_invoice_document">
+        <xpath expr="//table[@name='invoice_snln_table']" position="replace">
+            <table class="table table-sm" style="width: 50%;" name="invoice_snln_table" t-att-style="'display: none;' if without_sku else ''">
+                <thead>
+                    <tr>
+                        <th><span>Producto</span></th>
+                        <th class="text-right"><span>SN/LN</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="lot_values" t-as="snln_line">
+                        <tr>
+                            <td><t t-esc="snln_line['product_name']"/></td>
+                            <td class="text-right"><t t-esc="snln_line['lot_name']"/></td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+        </xpath>
+    </template>
+
+    <template id="report_accountmove_without_sku">
+        <t t-call="web.html_container">
+            <t t-set="without_sku" t-value="True"/>
+            <t t-foreach="docs" t-as="o">
+                <t t-set="lang" t-value="o.partner_id.lang"/>
+                <t t-set="print_with_payments" t-value="True"/>
+                <t t-if="o._get_name_invoice_report() == 'account.report_invoice_document'" t-call="account.report_invoice_document" t-lang="lang"/>
+                <t t-if="o._get_name_invoice_report() == 'l10n_ar.report_invoice_document'" t-call="l10n_ar.report_invoice_document" t-lang="lang"/>
+            </t>
+        </t>
+    </template>
+
+</odoo>

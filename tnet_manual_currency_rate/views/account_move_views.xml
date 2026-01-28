@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <record id="l10n_ar_ux.view_move_form" model="ir.ui.view">
+            <field name="name">currency.rate.account.move.form</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                <field name="payment_reference" position="after">
+                    <field name="currency_name" invisible="1"/>
+                    <field name="l10n_ar_reference_currency_rate" attrs="{'invisible': [('currency_name', '!=', 'ARS')]}"/>
+                </field>
+                <div name="journal_div" position="after">
+                    <label for="l10n_ar_currency_rate" string="" groups="account.group_account_readonly" invisible="context.get('default_journal_id') and context.get('move_type', 'entry') not in ['out_invoice', 'out_refund', 'in_invoice', 'in_refund']"/>
+                    <div name="journal_div" class="d-flex" invisible="context.get('default_journal_id') and context.get('move_type', 'entry') not in ['out_invoice', 'out_refund', 'in_invoice', 'in_refund']">
+                        <span attrs="{'invisible':['|', '|', '|' , '|', ('state','!=','draft'), ('other_currency', '=', False), ('country_code', '!=', 'AR'), ('l10n_ar_currency_rate', '=', 0.0), ('l10n_ar_currency_rate', '=', False)]}">T.C: </span>
+                        <field name="l10n_ar_currency_rate" style="margin-left: 5px !important;" attrs="{'invisible': ['|', '|', ('l10n_ar_currency_rate', '=', False), ('l10n_ar_currency_rate', '=', 0.0), ('other_currency', '=', False)]}"/>
+                        <field name="computed_currency_rate" style="margin-left: 5px !important;" attrs="{'invisible': ['|', ('l10n_ar_currency_rate', '!=', 0.0), ('other_currency', '=', False)]}"/>
+                        <button name="%(l10n_ar_ux.action_account_move_change_rate)d" string="(Editar)"  type="action" icon="fa-pencil" style="color:red; padding-top: 0px !important;" class="btn-link" attrs="{'invisible':['|', '|', '|' , '|', ('state','!=','draft'), ('other_currency', '=', False), ('country_code', '!=', 'AR'), ('l10n_ar_currency_rate', '=', 0.0), ('l10n_ar_currency_rate', '=', False)]}" help="Currency rate forced"/>
+                        <button name="%(l10n_ar_ux.action_account_move_change_rate)d" string="(Editar)"  type="action" icon="fa-pencil" style="padding-top: 0px !important;" class="btn-link" attrs="{'invisible':['|', '|', '|' , ('state','!=','draft'), ('other_currency', '=', False), ('country_code', '!=', 'AR'), ('l10n_ar_currency_rate', '!=', 0.0)]}"/>
+                    </div>
+                </div>
+            </field>
+        </record>
+
+        <record id="view_move_form" model="ir.ui.view">
+            <field name="name">currency.rate.account.move.form</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account_ux.view_move_form"/>
+            <field name="arch" type="xml">
+                <button name="%(account_ux.action_account_change_currency)d" position="attributes">
+                    <attribute name="string">(Editar)</attribute>
+                    <attribute name="style">padding-top: 0px !important;</attribute>
+                </button>
+            </field>
+        </record>
+
+        <record id="account_ux.view_account_change_currency" model="ir.ui.view">
+            <field name="name">Change Currency</field>
+            <field name="model">account.change.currency</field>
+            <field name="arch" type="xml">
+                <form string="Cambiar Moneda">
+                    <group string="Este asistente cambiará la moneda de la factura">
+                        <field name="move_id" invisible="1"/>
+                        <field name="currency_from" invisible="1"/>
+                        <field name="currency_to" invisible="1"/>
+                        <field name="currency_from_id" string="Moneda Actual"/>
+                        <field name="currency_to_id" domain="[('id', '!=', currency_from_id)]" string="Nueva Moneda"/>
+                        <field name="change_type" widget="radio" invisible="1"/>
+                        <field name="currency_rate" attrs="{'invisible': ['|', ('change_type', '=', 'currency'), ('currency_from', '=', 'ARS')]}"/>
+                        <field name="inverse_currency_rate" attrs="{'invisible': ['|', ('change_type', '=', 'currency'), ('currency_from', '!=', 'ARS')]}" string="Tasa monetaria"/>
+                    </group>
+                    <footer>
+                        <button name="change_currency" string="Cambiar Moneda" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancelar" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="account_manual_change_no_exchange_currency" model="ir.ui.view">
+            <field name="name">account.manual.change.no.exchange.currency</field>
+            <field name="model">account.change.currency</field>
+            <field name="inherit_id" ref="account_ux.view_account_change_no_exchange_currency"/>
+            <field name="arch" type="xml">
+                <field name="currency_rate" position="after">
+                    <field name="inverse_currency_rate" readonly="1" foce_save="1" invisible="1"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="account_manual_change_rate_form_view" model="ir.ui.view">
+            <field name="name">account.manual.change.rate.form.view</field>
+            <field name="model">account.move.change.rate</field>
+            <field name="inherit_id" ref="l10n_ar_ux.view_account_move_change_rate"/>
+            <field name="arch" type="xml">
+                <field name="day_rate" position="attributes">
+                    <attributte name="string">Tasa del Día</attributte>
+                </field>
+                <button name="confirm" position="attributes">
+                    <attributte name="string">Confirmar</attributte>
+                </button>
+            </field>
+        </record>
+    </data>
+</odoo>

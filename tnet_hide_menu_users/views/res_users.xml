@@ -1,0 +1,36 @@
+<odoo>
+    <data>
+        <record id="hide_user_menu" model="ir.ui.view">
+            <field name="name">hide.user.menu</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_form"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="is_admin" invisible="1"/>
+                </field>
+                <xpath expr="//notebook" position="inside">
+                    <page string="Hide Menu" attrs="{'invisible': [('is_admin','=', True)]}">
+                        <tree>
+                            <field name="hide_menu_ids"/>
+                        </tree>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="ir_ui_menu_users" model="ir.ui.view">
+            <field name="name">ir.ui.menu.users</field>
+            <field name="model">ir.ui.menu</field>
+            <field name="inherit_id" ref="base.edit_menu_access"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook" position="inside">
+                    <page string="Restrict Users" name="restrict_users">
+                        <tree>
+                            <field name="restrict_user_ids"/>
+                        </tree>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

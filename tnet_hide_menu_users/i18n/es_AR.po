@@ -1,0 +1,47 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* tnet_hide_menu_users
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 15.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-05-31 13:50+0000\n"
+"PO-Revision-Date: 2024-05-31 13:50+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: tnet_hide_menu_users
+#: model_terms:ir.ui.view,arch_db:tnet_hide_menu_users.hide_user_menu
+msgid "Hide Menu"
+msgstr "Ocultar Menú"
+
+#. module: tnet_hide_menu_users
+#: model:ir.model.fields,field_description:tnet_hide_menu_users.field_res_users__is_admin
+msgid "Is Admin"
+msgstr "Es Administrador"
+
+#. module: tnet_hide_menu_users
+#: model:ir.model,name:tnet_hide_menu_users.model_ir_ui_menu
+msgid "Menu"
+msgstr "Menú"
+
+#. module: tnet_hide_menu_users
+#: model:ir.model.fields,field_description:tnet_hide_menu_users.field_res_users__hide_menu_ids
+msgid "Menus"
+msgstr "Menúes"
+
+#. module: tnet_hide_menu_users
+#: model:ir.model.fields,field_description:tnet_hide_menu_users.field_ir_ui_menu__restrict_user_ids
+#: model_terms:ir.ui.view,arch_db:tnet_hide_menu_users.ir_ui_menu_users
+msgid "Restrict Users"
+msgstr "Usuarios Restringidos"
+
+#. module: tnet_hide_menu_users
+#: model:ir.model,name:tnet_hide_menu_users.model_res_users
+msgid "Users"
+msgstr "Usuarios"

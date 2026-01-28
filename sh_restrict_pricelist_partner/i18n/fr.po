@@ -1,0 +1,65 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* sh_restrict_pricelist_partner
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 15.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-12-24 07:04+0000\n"
+"PO-Revision-Date: 2020-12-24 07:04+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: sh_restrict_pricelist_partner
+#: model:ir.model.fields,field_description:sh_restrict_pricelist_partner.field_res_partner__pricelist_ids
+#: model:ir.model.fields,field_description:sh_restrict_pricelist_partner.field_res_users__pricelist_ids
+msgid "Allowed Pricelists"
+msgstr "Préceux autorisés"
+
+#. module: sh_restrict_pricelist_partner
+#: model:ir.model,name:sh_restrict_pricelist_partner.model_res_partner
+msgid "Contact"
+msgstr "Contact"
+
+#. module: sh_restrict_pricelist_partner
+#: model:ir.model.fields,field_description:sh_restrict_pricelist_partner.field_res_partner__display_name
+#: model:ir.model.fields,field_description:sh_restrict_pricelist_partner.field_sale_order__display_name
+msgid "Display Name"
+msgstr "Afficher un nom"
+
+#. module: sh_restrict_pricelist_partner
+#: model:ir.model.fields,field_description:sh_restrict_pricelist_partner.field_res_partner__id
+#: model:ir.model.fields,field_description:sh_restrict_pricelist_partner.field_sale_order__id
+msgid "ID"
+msgstr "identifiant"
+
+#. module: sh_restrict_pricelist_partner
+#: model:ir.model.fields,help:sh_restrict_pricelist_partner.field_sale_order__pricelist_id
+msgid "If you change the pricelist, only newly added lines will be affected."
+msgstr "Si vous changez de la liste de chômeurs, seules des lignes nouvellement ajoutées seront affectées."
+
+#. module: sh_restrict_pricelist_partner
+#: model:ir.model.fields,field_description:sh_restrict_pricelist_partner.field_res_partner____last_update
+#: model:ir.model.fields,field_description:sh_restrict_pricelist_partner.field_sale_order____last_update
+msgid "Last Modified on"
+msgstr "Dernière modification sur"
+
+#. module: sh_restrict_pricelist_partner
+#: model:ir.model.fields,field_description:sh_restrict_pricelist_partner.field_sale_order__partner_pricelist_ids
+msgid "Partner Pricelist"
+msgstr "Priceliste partenaire"
+
+#. module: sh_restrict_pricelist_partner
+#: model:ir.model.fields,field_description:sh_restrict_pricelist_partner.field_sale_order__pricelist_id
+msgid "Pricelist"
+msgstr "Liste de prix"
+
+#. module: sh_restrict_pricelist_partner
+#: model:ir.model,name:sh_restrict_pricelist_partner.model_sale_order
+msgid "Sales Order"
+msgstr "Ordre des ventes"

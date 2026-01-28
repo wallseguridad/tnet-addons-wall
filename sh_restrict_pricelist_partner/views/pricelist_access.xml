@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_partner_pricelist_form" model="ir.ui.view">
+        <field name="name">res.partner.pricelist.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form" />
+        <field name="arch" type="xml">
+            <field name="property_product_pricelist" position="after">
+                <field name="pricelist_ids" domain="[('active','=',True)]" widget="many2many_tags" />
+            </field>
+        </field>
+    </record>
+    <record id="sale_order_partner_pricelist_form" model="ir.ui.view">
+        <field name="name">sale.order.pricelist.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form" />
+        <field name="arch" type="xml">
+            <field name="pricelist_id" position="after">
+                <field name="partner_pricelist_ids" domain="[('active','=',True)]" widget="many2many_tags" invisible="1"/>
+            </field>
+        </field>
+    </record>
+</odoo>

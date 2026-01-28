@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_saleorder_document" inherit_id="l10n_ar_sale.report_saleorder_document" priority="1" primary="True">
+        <xpath expr="//div[@id='informations']//div[1]" position="replace">
+            <div class="col-6">
+                <span><strong>Razón Social: </strong> <t t-esc="doc.partner_id.display_name"/></span><br/>
+                <span><strong>Dirección: </strong> <t t-esc="doc.partner_id.street"/></span><br/>
+                <span><strong>Ubicación: </strong> <t t-esc="doc.partner_id.city"/></span><br/>
+                <span><strong>Condición de venta: </strong> <span t-field="doc.picking_policy"/></span><br/>
+                <span><strong>CUIT: </strong> <t t-esc="doc.partner_id.vat"/></span><br/>
+            </div>
+        </xpath>
+        <xpath expr="//span[@t-field='line.product_uom']" position="replace"/>
+        <xpath expr="//th[@name='th_discount']" position="replace"/>
+        <xpath expr="//td[@t-if='display_discount']" position="replace"/>
+        <xpath expr="//th[@name='th_taxes']" position="replace">
+            <th name="th_taxes" class="text-right">IVA</th>
+            <th name="th_bonif" class="text-right">Bonif</th>
+        </xpath>
+        <xpath expr="//td[@name='td_subtotal']" position="replace">
+            <td name="td_subtotal" class="text-right o_price_total">
+                <span t-field="line.price_total"/>
+            </td>
+        </xpath>
+        <xpath expr="//td[@name='td_taxes']" position="replace">
+            <td name="td_taxes" class="text-right">
+                <span t-esc="', '.join(map(lambda x: (x.description or x.name), line.tax_id))"/>
+            </td>
+            <td name="td_bonif" class="text-right">
+                <span t-field="line.discount"/>
+            </td>
+        </xpath>
+        <xpath expr="//th[@name='th_description']" position="before">
+            <th name="th_code" class="text-left" t-att-style="'display: none;' if without_sku else ''">Código</th>
+        </xpath>
+        <xpath expr="//td[@name='td_name']" position="before">
+            <td name="td_code" class="text-left" t-att-style="'display: none;' if without_sku else ''">
+                <span t-field="line.product_id.default_code"/>
+            </td>
+        </xpath>
+        <xpath expr="//tbody[@class='sale_tbody']//t//t[@t-set='current_subtotal']" position="before">
+            <t t-set="current_name" t-value="line.name.replace('[{}]'.format(line.product_id.default_code),'')"/>
+        </xpath>
+        <xpath expr="//td[@name='td_name']//span" position="replace">
+            <t t-esc="current_name"/>
+        </xpath>
+    </template>
+
+    <template id="report_saleorder_without_sku">
+        <t t-call="web.html_container">
+            <t t-set="without_sku" t-value="True"/>
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="wall_report_custom.report_saleorder_document" t-lang="doc.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+
+</odoo>

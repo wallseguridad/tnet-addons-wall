@@ -1,0 +1,265 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* tnet_manual_currency_rate
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 15.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-08-08 21:40+0000\n"
+"PO-Revision-Date: 2024-08-08 21:40+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: tnet_manual_currency_rate
+#: model_terms:ir.ui.view,arch_db:tnet_manual_currency_rate.view_move_form
+msgid "(Editar)"
+msgstr ""
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model,name:tnet_manual_currency_rate.model_account_change_currency
+msgid "Change Currency"
+msgstr "Cambiar Moneda"
+
+#. module: tnet_manual_currency_rate
+#: model_terms:ir.ui.view,arch_db:tnet_manual_currency_rate.account_manual_change_rate_form_view
+msgid "Confirmar"
+msgstr ""
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_l10n_ar_currency_rate__create_uid
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_l10n_ar_currency_rate_purchase__create_uid
+msgid "Created by"
+msgstr "Creado por"
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_l10n_ar_currency_rate__create_date
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_l10n_ar_currency_rate_purchase__create_date
+msgid "Created on"
+msgstr "Creado el"
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model,name:tnet_manual_currency_rate.model_res_currency
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_l10n_ar_currency_rate__name
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_l10n_ar_currency_rate_purchase__name
+msgid "Currency"
+msgstr "Moneda"
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model.fields,help:tnet_manual_currency_rate.field_account_bank_statement_line__currency_name
+#: model:ir.model.fields,help:tnet_manual_currency_rate.field_account_change_currency__currency_from
+#: model:ir.model.fields,help:tnet_manual_currency_rate.field_account_change_currency__currency_to
+#: model:ir.model.fields,help:tnet_manual_currency_rate.field_account_move__currency_name
+#: model:ir.model.fields,help:tnet_manual_currency_rate.field_account_payment__currency_name
+msgid "Currency Code (ISO 4217)"
+msgstr ""
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_account_change_currency__currency_from
+msgid "Currency From Name"
+msgstr ""
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_account_bank_statement_line__currency_name
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_account_move__currency_name
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_account_payment__currency_name
+msgid "Currency Name"
+msgstr ""
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_account_change_currency__currency_rate
+msgid "Currency Rate"
+msgstr "Tasa monetaria"
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_purchase_order__l10n_ar_currency_rate_ids
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_sale_order__l10n_ar_currency_rate_ids
+msgid "Currency Rates"
+msgstr "Tipos de cambio"
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_account_change_currency__currency_to
+msgid "Currency To Name"
+msgstr ""
+
+#. module: tnet_manual_currency_rate
+#: code:addons/tnet_manual_currency_rate/models/account_move.py:0
+#, python-format
+msgid "Currency changed from %s to %s with rate %s"
+msgstr ""
+
+#. module: tnet_manual_currency_rate
+#: code:addons/tnet_manual_currency_rate/models/account_move.py:0
+#, python-format
+msgid "Currency rate changed from %s to %s"
+msgstr ""
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_l10n_ar_currency_rate__date
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_l10n_ar_currency_rate_purchase__date
+msgid "Date Rate"
+msgstr "Fecha"
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_l10n_ar_currency_rate__display_name
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_l10n_ar_currency_rate_purchase__display_name
+msgid "Display Name"
+msgstr "Nombre mostrado"
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_account_change_currency__flag_inverse_rate
+msgid "Flag Inverse Rate"
+msgstr ""
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_account_change_currency__flag_rate
+msgid "Flag Rate"
+msgstr ""
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_l10n_ar_currency_rate__id
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_l10n_ar_currency_rate_purchase__id
+msgid "ID"
+msgstr ""
+
+#. module: tnet_manual_currency_rate
+#: code:addons/tnet_manual_currency_rate/models/account_move.py:0
+#: code:addons/tnet_manual_currency_rate/models/account_move.py:0
+#: code:addons/tnet_manual_currency_rate/models/purchase_order.py:0
+#: code:addons/tnet_manual_currency_rate/models/sale_order.py:0
+#, python-format
+msgid "Input Error"
+msgstr "Error de Ingreso"
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_account_change_currency__inverse_currency_rate
+msgid "Inverse Rate"
+msgstr "Tasa inversa"
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model,name:tnet_manual_currency_rate.model_account_move
+msgid "Journal Entry"
+msgstr "Asiento contable"
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_l10n_ar_currency_rate____last_update
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_l10n_ar_currency_rate_purchase____last_update
+msgid "Last Modified on"
+msgstr "Última modificación el"
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_l10n_ar_currency_rate__write_uid
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_l10n_ar_currency_rate_purchase__write_uid
+msgid "Last Updated by"
+msgstr "Última actualización por"
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_l10n_ar_currency_rate__write_date
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_l10n_ar_currency_rate_purchase__write_date
+msgid "Last Updated on"
+msgstr "Última actualización el"
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_l10n_ar_currency_rate__manual_rate
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_l10n_ar_currency_rate_purchase__manual_rate
+msgid "Manual Rate"
+msgstr "TC Manual"
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_res_currency__l10n_ar_use_manual_rate
+msgid "Manual Rate?"
+msgstr "TC Manual?"
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_l10n_ar_currency_rate__inverse_rate
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_l10n_ar_currency_rate_purchase__inverse_rate
+msgid "Odoo Rate"
+msgstr "TC Odoo"
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_purchase_order_line__l10n_ar_price_unit_usd
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_sale_order_line__l10n_ar_price_unit_usd
+msgid "Price Unit USD"
+msgstr "Precio Unitario u$s"
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model,name:tnet_manual_currency_rate.model_purchase_order
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_l10n_ar_currency_rate_purchase__purchase_order_id
+msgid "Purchase Order"
+msgstr "Pedido de compra"
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model,name:tnet_manual_currency_rate.model_purchase_order_line
+msgid "Purchase Order Line"
+msgstr "Línea de pedido de compra"
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_account_bank_statement_line__l10n_ar_reference_currency_rate
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_account_move__l10n_ar_reference_currency_rate
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_account_payment__l10n_ar_reference_currency_rate
+msgid "Referencia T.C"
+msgstr ""
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model.fields,field_description:tnet_manual_currency_rate.field_l10n_ar_currency_rate__sale_order_id
+msgid "Sale Order"
+msgstr "Pedido de Venta"
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model,name:tnet_manual_currency_rate.model_sale_order
+msgid "Sales Order"
+msgstr "Pedido de venta"
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model,name:tnet_manual_currency_rate.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Línea de pedido de venta"
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model.fields,help:tnet_manual_currency_rate.field_account_change_currency__inverse_currency_rate
+msgid "Select a inverse rate to apply on the invoice"
+msgstr "Seleccione un Tipo de Cambio Inverso para aplicar a la Factura"
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model.fields,help:tnet_manual_currency_rate.field_account_change_currency__currency_rate
+msgid "Select a rate to apply on the invoice"
+msgstr "Seleccione un Tipo de Cambio para aplicar a la Factura"
+
+#. module: tnet_manual_currency_rate
+#: model_terms:ir.ui.view,arch_db:tnet_manual_currency_rate.account_manual_change_rate_form_view
+msgid "Tasa del Día"
+msgstr ""
+
+#. module: tnet_manual_currency_rate
+#: code:addons/tnet_manual_currency_rate/models/account_move.py:0
+#, python-format
+msgid "The manual inverse rate value must be greater than or equal to 0.0"
+msgstr "El Tipo de Cambio Inverso debe ser mayor o igual a 0.0"
+
+#. module: tnet_manual_currency_rate
+#: code:addons/tnet_manual_currency_rate/models/account_move.py:0
+#: code:addons/tnet_manual_currency_rate/models/purchase_order.py:0
+#: code:addons/tnet_manual_currency_rate/models/sale_order.py:0
+#, python-format
+msgid "The manual rate value must be greater than or equal to 0.0"
+msgstr "El Tipo de Cambio Manual debe ser mayor o igual a 0.0"
+
+#. module: tnet_manual_currency_rate
+#: model_terms:ir.ui.view,arch_db:tnet_manual_currency_rate.currency_rate_purchase_order_form_view
+msgid "Update Standard Price"
+msgstr "Actualizar Costo Producto"
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model,name:tnet_manual_currency_rate.model_account_move_change_rate
+msgid "account.move.change.rate"
+msgstr ""
+
+#. module: tnet_manual_currency_rate
+#: model:ir.model,name:tnet_manual_currency_rate.model_l10n_ar_currency_rate
+#: model:ir.model,name:tnet_manual_currency_rate.model_l10n_ar_currency_rate_purchase
+msgid "l10n ar Currency Rate"
+msgstr "l10 ar Tipo de Cambio"
