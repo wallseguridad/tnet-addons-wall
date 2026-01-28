@@ -8,7 +8,7 @@
     'author': 'Luis Trajtenberg',
     'website': 'https://www.tecnicanet.com',
     'category': "Localization/Argentina",
-    'depends': ['base', 'sale', 'purchase', 'l10n_ar', 'l10n_ar_ux', 'account_ux'],
+    'depends': ['base', 'sale', 'purchase', 'l10n_ar', 'l10n_ar_ux', 'account_ux','stock_picking_invoice_link'],
     'data': [
         "security/security.xml",
         "security/ir.model.access.csv",
