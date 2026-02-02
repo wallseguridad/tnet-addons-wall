@@ -14,8 +14,7 @@ class SaleOrder(models.Model):
 
             currency_manual_rates = {}
             for l10n_ar_currency_rate_id in self.l10n_ar_currency_rate_ids:
-                if (l10n_ar_currency_rate_id.manual_rate
-                    and l10n_ar_currency_rate_id.manual_rate != l10n_ar_currency_rate_id.inverse_rate):
+                if (l10n_ar_currency_rate_id.manual_rate and l10n_ar_currency_rate_id.manual_rate > 0.0):
                     currency_manual_rates[l10n_ar_currency_rate_id.name.id] = l10n_ar_currency_rate_id.manual_rate
 
             if currency_manual_rates:
