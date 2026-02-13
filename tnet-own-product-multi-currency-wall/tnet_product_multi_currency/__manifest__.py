@@ -2,11 +2,11 @@
 
 {
     'name': "TNET Product Multi Currency",
-    'version': '15.0.4',
+    'version': '18.0.4',
     'description': """Product Multi Currency""",
     'summary': "Product Multi Currency",
-    'author': 'Luis Trajtenberg',
-    'website': 'https://www.tecnicanet.com',
+    'author': 'GauchoCode',
+    'website': 'https://www.gauchocode.com',
     'category': "Inventory/Inventory",
     'depends': ['product', 'sale', 'purchase'],
     'data': [

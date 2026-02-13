@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 
 {
-    "name": "Tecnicanet Hide Menu Users",
-    "version": "15.0.0.0",
+    "name": "GauchoCode Hide Menu Users",
+    "version": "18.0.0.0",
     "summary": """ 
             Hide Menu Users
             """,
     "description": """ 
             Hide Menu Users
             """,
-    "author": "Luis Trajtenberg",
-    "website": 'https://www.tecnicanet.com',
+    "author": "GauchoCode",
+    "website": 'https://www.gauchocode.com',
     "category": "Tools",
     "license": "LGPL-3",
     "installable": True,

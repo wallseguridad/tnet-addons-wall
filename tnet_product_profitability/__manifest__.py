@@ -2,12 +2,12 @@
 
 {
     'name' : 'TNET Product Profitability',
-    'version' : '15.0.2',
+    'version' : '18.0.1.0.1',
     'description': """Calculate profitability from cost for a product""",
     'summary': "Calculate profitability from cost for a product",
-    'author' : 'Luis Trajtenberg',
+    'author' : 'GauchoCode',
     'category' : 'Inventory/Inventory',
-    'website': 'https://www.tecnicanet.com',
+    'website': 'https://www.gauchocode.com',
     'depends' : ['base', 'product', 'tnet_product_multi_currency'],
     'demo' : [],
     'data' : ['views/product_views.xml',

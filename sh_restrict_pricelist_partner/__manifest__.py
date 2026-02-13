@@ -2,15 +2,15 @@
 {
     "name": "Restrict Pricelist For customer",
 
-    "author": "Softhealer Technologies",
+    "author": "GauchoCode",
 
     "license": "OPL-1",
 
-    "website": "https://www.softhealer.com",
+    "website": "https://www.gauchocode.com",
 
-    "support": "support@softhealer.com",
+    "support": "support@gauchocode.com",
 
-    "version": "15.0.2",
+    "version": "18.0.0.1.1",
 
     "category": "Sales",
 

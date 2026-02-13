@@ -1,7 +1,7 @@
 {
     'name': 'Wall Reports Custom',
-    "author": "Valentin Romero, TecnicanetBA",
-    'version': '15.0.0.1.0.4',
+    "author": "GauchoCode",
+    'version': '18.0.0.1.1',
     'description': """""",
     "summary" : """""",
     "license" : "LGPL-3",

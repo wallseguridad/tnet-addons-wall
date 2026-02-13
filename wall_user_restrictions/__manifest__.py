@@ -2,11 +2,11 @@
 
 {
     'name': "Wall User Restrictrions",
-    'version': '15.0.2',
+    'version': '18.0.2.0.1',
     'description': """Wall User Restrictrions""",
     'summary': "Wall User Restrictrions",
-    'author': 'Luis Trajtenberg',
-    'website': 'https://www.tecnicanet.com',
+    'author': 'GauchoCode',
+    'website': 'https://www.gauchocode.com',
     'category': "Generic Modules",
     'depends': ['base', 'account', 'sale', 'purchase', 'stock'],
     'data': [
