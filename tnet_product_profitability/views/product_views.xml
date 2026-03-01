@@ -4,7 +4,7 @@
         <record id="product_template_profitability_form_view" model="ir.ui.view">
             <field name="name">product.template.profitability.form</field>
             <field name="model">product.template</field>
-			<field name="inherit_id" ref="tnet_product_multi_currency.multi_currency_product_template_form_view"/>
+			<field name="inherit_id" ref="product_multi_currency.multi_currency_product_template_form_view"/>
             <field name="arch" type="xml">
 				<xpath expr="//form/sheet/notebook/page[@name='purchase']/group[@name='purchase']/group[@name='cost_sales_prices']/div[@name='pricing']" position="after">
                     <label for="property_profitability_percentage" class="mt-1"/>

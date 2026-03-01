@@ -1,3 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_l10n_ar_currency_rate,l10n.ar.currency.rate,model_l10n_ar_currency_rate,,1,1,1,1
-access_l10n_ar_currency_rate_purchase,l10n.ar.currency.rate.purchase,model_l10n_ar_currency_rate_purchase,,1,1,1,1
