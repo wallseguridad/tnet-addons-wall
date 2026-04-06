@@ -9,7 +9,7 @@
                     <field name="is_admin" invisible="1"/>
                 </field>
                 <xpath expr="//notebook" position="inside">
-                    <page string="Hide Menu" attrs="{'invisible': [('is_admin','=', True)]}">
+                    <page string="Hide Menu" invisible="is_admin == True">
                         <tree>
                             <field name="hide_menu_ids"/>
                         </tree>
