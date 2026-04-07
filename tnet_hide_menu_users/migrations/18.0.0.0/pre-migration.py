@@ -99,10 +99,16 @@ def migrate(cr, version):
         'tnet_manual_currency_rate',      # reemplazado por manual_currency_rate (gc)
         'tnet_product_multi_currency',    # reemplazado por product_multi_currency (gc)
     ]
-    cr.execute(
-        "UPDATE ir_ui_view SET active = FALSE WHERE module = ANY(%s) AND active = TRUE",
-        (gone_modules,)
-    )
+    # Las vistas no tienen columna `module` directa — está en ir_model_data
+    cr.execute("""
+        UPDATE ir_ui_view SET active = FALSE
+        WHERE active = TRUE
+          AND id IN (
+              SELECT res_id FROM ir_model_data
+              WHERE model = 'ir.ui.view'
+                AND module = ANY(%s)
+          )
+    """, (gone_modules,))
     print(f"[wall pre-migration] Vistas de módulos eliminados en v18: {cr.rowcount} desactivadas")
 
     # -------------------------------------------------------------------------
