@@ -72,13 +72,15 @@ def migrate(cr, version):
     ]
 
     if removed_modules:
-        placeholders = ','.join(['%s'] * len(removed_modules))
-        cr.execute(f"""
-            UPDATE ir_ui_view
-            SET active = FALSE
-            WHERE module IN ({placeholders})
-              AND active = TRUE
-        """, removed_modules)
+        cr.execute("""
+            UPDATE ir_ui_view SET active = FALSE
+            WHERE active = TRUE
+              AND id IN (
+                  SELECT res_id FROM ir_model_data
+                  WHERE model = 'ir.ui.view'
+                    AND module = ANY(%s)
+              )
+        """, (removed_modules,))
         deactivated = cr.rowcount
         if deactivated:
             print(f"[pre-migration] Desactivadas {deactivated} vistas de módulos eliminados en v18")
