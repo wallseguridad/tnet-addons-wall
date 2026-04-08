@@ -134,4 +134,30 @@ def migrate(cr, version):
     """, (removed_models,))
     print(f"[wall pre-migration] Acciones de ventana de modelos removidos: {cr.rowcount} eliminadas")
 
+    # -------------------------------------------------------------------------
+    # 7. Borrar vistas DB de módulos que tienen XML actualizado pero vistas
+    #    viejas en DB incompatibles con la vista padre de v18.
+    #    Odoo valida el arch en DB ANTES de aplicar el XML nuevo — si el arch
+    #    viejo tiene un xpath que ya no existe en el padre v18, el upgrade falla.
+    #    Al borrar las vistas, Odoo las crea fresh desde el XML nuevo.
+    # -------------------------------------------------------------------------
+    modules_stale_views = [
+        'website_sale_hide_price',   # xpath css_quantity cambió en v18
+    ]
+    for module in modules_stale_views:
+        cr.execute("""
+            DELETE FROM ir_ui_view
+            WHERE id IN (
+                SELECT res_id FROM ir_model_data
+                WHERE model = 'ir.ui.view' AND module = %s
+            )
+        """, (module,))
+        deleted_views = cr.rowcount
+        cr.execute(
+            "DELETE FROM ir_model_data WHERE module = %s AND model = 'ir.ui.view'",
+            (module,)
+        )
+        if deleted_views:
+            print(f"[wall pre-migration] Vistas DB stale de '{module}': {deleted_views} borradas para recreación fresh")
+
     print("[wall pre-migration] Limpieza completada.")
