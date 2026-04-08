@@ -61,6 +61,7 @@ def migrate(cr, version):
         'action_invoice_sent',
         'do_merge',
         'account_invoice_action',
+        'action_open_related_document',   # eliminado/renombrado en v18 de account.move.line
     ]
     for ref in removed_references:
         cr.execute("""
