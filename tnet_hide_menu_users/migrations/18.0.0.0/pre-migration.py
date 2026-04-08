@@ -79,6 +79,7 @@ def migrate(cr, version):
     #    (fusionados en otros módulos — Odoo no los va a reinstalar)
     # -------------------------------------------------------------------------
     gone_modules = [
+        # módulos Odoo nativos fusionados/eliminados en v17/v18
         'account_edi_facturx',
         'account_predictive_bills',
         'account_reports_tax_reminder',
@@ -94,10 +95,28 @@ def migrate(cr, version):
         'web_kanban_gauge',
         'website_form_project',
         'social_media',
+        # módulos ADHOC v15 reemplazados por módulos nativos Odoo en v18
+        'account_withholding',            # reemplazado por l10n_ar_withholding (nativo)
+        'account_withholding_automatic',  # fusionado en l10n_ar_withholding
+        # módulos MercadoLibre — pendientes migración o sin archivos en v18
+        'meli_oerp',
+        'meli_oerp_accounting',
+        'meli_oerp_multiple',
+        'meli_oerp_premium',
+        'meli_oerp_stock',
+        'odoo_connector_api',             # conector usado por meli_oerp
+        # módulos GauchoCode — pendientes migración a v18
+        'partner_type',
+        'product_brand',
+        'product_profitability_fix',
+        'product_sap_code',
+        'purchase_discount',
         # módulos custom v15 pendientes de migración
         'website_price_tax_custom',
         'website_product_custom',
         'website_sale_stock_message',
+        'website_sale_product_attachment',
+        'website_sale_comparison_hide_price',
         'studio_customization',
         'tnet_manual_currency_rate',      # reemplazado por manual_currency_rate (gc)
         'tnet_product_multi_currency',    # reemplazado por product_multi_currency (gc)
@@ -137,7 +156,21 @@ def migrate(cr, version):
     print(f"[wall pre-migration] Acciones de ventana de modelos removidos: {cr.rowcount} eliminadas")
 
     # -------------------------------------------------------------------------
-    # 7. Borrar vistas DB de módulos que tienen XML actualizado pero vistas
+    # 7. Marcar módulos ausentes como 'uninstalled' en ir_module_module
+    #    Si un módulo está como 'installed'/'to upgrade' pero sus archivos no
+    #    existen en el addons path de v18, Odoo reporta "inconsistent states"
+    #    y todos sus dependientes también quedan bloqueados.
+    # -------------------------------------------------------------------------
+    cr.execute("""
+        UPDATE ir_module_module
+        SET state = 'uninstalled'
+        WHERE name = ANY(%s)
+          AND state IN ('installed', 'to upgrade', 'to remove')
+    """, (gone_modules,))
+    print(f"[wall pre-migration] Módulos marcados como uninstalled: {cr.rowcount}")
+
+    # -------------------------------------------------------------------------
+    # 8. Borrar vistas DB de módulos que tienen XML actualizado pero vistas
     #    viejas en DB incompatibles con la vista padre de v18.
     #    Odoo valida el arch en DB ANTES de aplicar el XML nuevo — si el arch
     #    viejo tiene un xpath que ya no existe en el padre v18, el upgrade falla.
@@ -164,7 +197,7 @@ def migrate(cr, version):
             print(f"[wall pre-migration] Vistas DB stale de '{module}': {deleted_views} borradas para recreación fresh")
 
     # -------------------------------------------------------------------------
-    # 8. Registrar account_payment_method existentes bajo l10n_latam_check
+    # 9. Registrar account_payment_method existentes bajo l10n_latam_check
     #    En v15 estos métodos los creaba un módulo ADHOC. En v18 los adopta
     #    el módulo nativo l10n_latam_check. Sin ir_model_data que apunte al
     #    registro existente, Odoo intenta INSERT y falla por unique constraint.
