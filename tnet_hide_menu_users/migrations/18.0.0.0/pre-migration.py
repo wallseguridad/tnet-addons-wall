@@ -195,6 +195,26 @@ def migrate(cr, version):
     print(f"[wall pre-migration] Módulos marcados como uninstalled: {cr.rowcount}")
 
     # -------------------------------------------------------------------------
+    # 7b. Marcar módulos ADHOC con versiones v15 como 'to upgrade'
+    #     Estos módulos tienen dependencias obsoletas en sus versiones v15
+    #     (ej: account_withholding_automatic que ya no existe en v18).
+    #     Al marcarlos 'to upgrade', Odoo lee su manifest v18 desde disco
+    #     y resuelve la cadena de dependencias correctamente.
+    # -------------------------------------------------------------------------
+    adhoc_modules_to_upgrade = [
+        'account_payment_group',
+        'l10n_ar_account_withholding',
+        'l10n_latam_check_adhoc',
+    ]
+    cr.execute("""
+        UPDATE ir_module_module
+        SET state = 'to upgrade'
+        WHERE name = ANY(%s)
+          AND state = 'installed'
+    """, (adhoc_modules_to_upgrade,))
+    print(f"[wall pre-migration] Módulos ADHOC v15 marcados para upgrade: {cr.rowcount}")
+
+    # -------------------------------------------------------------------------
     # 8. Borrar vistas DB de módulos que tienen XML actualizado pero vistas
     #    viejas en DB incompatibles con la vista padre de v18.
     #    Odoo valida el arch en DB ANTES de aplicar el XML nuevo — si el arch
