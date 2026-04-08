@@ -63,6 +63,7 @@ def migrate(cr, version):
         'account_invoice_action',
         'action_open_related_document',   # eliminado/renombrado en v18 de account.move.line
         'l10n_latam_check_number',        # removido de account.payment.register en v18
+        '1-line.discount / 100.0',        # l10n_ar_sale: t-esc removido del portal template en v18
     ]
     for ref in removed_references:
         cr.execute("""
