@@ -160,4 +160,34 @@ def migrate(cr, version):
         if deleted_views:
             print(f"[wall pre-migration] Vistas DB stale de '{module}': {deleted_views} borradas para recreación fresh")
 
+    # -------------------------------------------------------------------------
+    # 8. Registrar account_payment_method existentes bajo l10n_latam_check
+    #    En v15 estos métodos los creaba un módulo ADHOC. En v18 los adopta
+    #    el módulo nativo l10n_latam_check. Sin ir_model_data que apunte al
+    #    registro existente, Odoo intenta INSERT y falla por unique constraint.
+    # -------------------------------------------------------------------------
+    latam_check_methods = [
+        ('new_third_party_checks',  'inbound',  'account_payment_method_new_third_party_checks'),
+        ('out_third_party_checks',  'outbound', 'account_payment_method_out_third_party_checks'),
+        ('new_own_checks',          'outbound', 'account_payment_method_new_own_checks'),
+        ('in_third_party_checks',   'inbound',  'account_payment_method_in_third_party_checks'),
+        ('return_third_party_checks', 'outbound', 'account_payment_method_return_third_party_checks'),
+    ]
+    for code, payment_type, ext_id_name in latam_check_methods:
+        cr.execute("""
+            INSERT INTO ir_model_data (module, name, model, res_id, noupdate, create_date, write_date, create_uid, write_uid)
+            SELECT
+                'l10n_latam_check',
+                %s,
+                'account.payment.method',
+                id,
+                TRUE,
+                NOW(), NOW(), 1, 1
+            FROM account_payment_method
+            WHERE code = %s AND payment_type = %s
+            ON CONFLICT (module, name) DO UPDATE SET res_id = EXCLUDED.res_id
+        """, (ext_id_name, code, payment_type))
+        if cr.rowcount:
+            print(f"[wall pre-migration] account_payment_method '{code}' registrado bajo l10n_latam_check")
+
     print("[wall pre-migration] Limpieza completada.")
