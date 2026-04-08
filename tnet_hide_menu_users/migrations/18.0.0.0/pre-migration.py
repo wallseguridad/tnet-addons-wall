@@ -143,6 +143,7 @@ def migrate(cr, version):
     # -------------------------------------------------------------------------
     modules_stale_views = [
         'website_sale_hide_price',   # xpath css_quantity cambió en v18
+        'l10n_ar_tax',               # l10n_latam_check_number removido del XML en v18
     ]
     for module in modules_stale_views:
         cr.execute("""
