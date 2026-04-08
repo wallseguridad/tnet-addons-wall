@@ -182,12 +182,20 @@ def migrate(cr, version):
         'l10n_ar_sale',              # múltiples views stale (t-esc, t-call) removidos en v18
     ]
     for module in modules_stale_views:
+        # Primero borrar hijos que heredan de las vistas del módulo (FK constraint)
+        # usando CTE recursivo para cubrir herencias anidadas
         cr.execute("""
-            DELETE FROM ir_ui_view
-            WHERE id IN (
-                SELECT res_id FROM ir_model_data
-                WHERE model = 'ir.ui.view' AND module = %s
+            WITH RECURSIVE view_tree AS (
+                SELECT id FROM ir_ui_view
+                WHERE id IN (
+                    SELECT res_id FROM ir_model_data
+                    WHERE model = 'ir.ui.view' AND module = %s
+                )
+                UNION ALL
+                SELECT child.id FROM ir_ui_view child
+                JOIN view_tree parent ON child.inherit_id = parent.id
             )
+            DELETE FROM ir_ui_view WHERE id IN (SELECT id FROM view_tree)
         """, (module,))
         deleted_views = cr.rowcount
         cr.execute(
@@ -195,7 +203,7 @@ def migrate(cr, version):
             (module,)
         )
         if deleted_views:
-            print(f"[wall pre-migration] Vistas DB stale de '{module}': {deleted_views} borradas para recreación fresh")
+            print(f"[wall pre-migration] Vistas DB stale de '{module}': {deleted_views} borradas (incluyendo hijos)")
 
     # -------------------------------------------------------------------------
     # 9. Registrar account_payment_method existentes bajo l10n_latam_check
