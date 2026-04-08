@@ -10,7 +10,7 @@
     'website': 'https://www.gauchocode.com',
     'depends': ['product_multi_currency'],
     'demo': [],
-    'data': ['views/legacy_bridge_views.xml'],
+    'data': ['views/product_views.xml'],
     'qweb': [],
     'license': 'LGPL-3',
     'auto_install': False,
