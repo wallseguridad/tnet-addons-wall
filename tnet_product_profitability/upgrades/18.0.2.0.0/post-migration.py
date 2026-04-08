@@ -4,59 +4,85 @@
 # En v17/18 el mecanismo cambió: el valor se almacena directamente en la columna
 # de la tabla del modelo (gestionado por el ORM con contexto de compañía).
 #
-# Este script copia los valores de `ir.property` al nuevo mecanismo
-# usando el ORM (post-migration = módulo ya cargado, entorno disponible).
+# IMPORTANTE: `ir.property` fue eliminado como modelo ORM en v18, pero la
+# tabla `ir_property` todavía existe en la DB durante la migración.
+# Se usa SQL crudo para leer los valores y el ORM para escribirlos.
 
 
 def migrate(cr, version):
     if not version:
-        # Instalación fresca (no upgrade): no hay datos en ir.property que migrar.
         return
 
-    from odoo import api, SUPERUSER_ID
+    # Verificar que la tabla ir_property aún existe en la DB
+    cr.execute("""
+        SELECT EXISTS (
+            SELECT FROM information_schema.tables
+            WHERE table_name = 'ir_property'
+        )
+    """)
+    if not cr.fetchone()[0]:
+        print("[tnet_product_profitability] Tabla ir_property no existe, nada que migrar")
+        return
 
-    env = api.Environment(cr, SUPERUSER_ID, {})
+    # Buscar el field_id del campo property_profitability_percentage en ir.model.fields
+    cr.execute("""
+        SELECT f.id
+        FROM ir_model_fields f
+        JOIN ir_model m ON m.id = f.model_id
+        WHERE f.name = 'property_profitability_percentage'
+          AND m.model = 'product.template'
+        LIMIT 1
+    """)
+    row = cr.fetchone()
+    if not row:
+        print("[tnet_product_profitability] Campo property_profitability_percentage no existe, nada que migrar")
+        return
+    field_id = row[0]
 
-    # Buscar el campo en ir.model.fields
-    field = env['ir.model.fields'].search([
-        ('name', '=', 'property_profitability_percentage'),
-        ('model', '=', 'product.template'),
-    ], limit=1)
+    # Leer todos los valores de ir_property para este campo (por-registro, no default)
+    cr.execute("""
+        SELECT res_id, value_float, company_id
+        FROM ir_property
+        WHERE fields_id = %s
+          AND res_id IS NOT NULL
+          AND res_id != ''
+          AND type = 'float'
+    """, (field_id,))
+    rows = cr.fetchall()
 
-    if not field:
-        return  # el campo ya no existe en el modelo, nada que hacer
-
-    # Buscar todas las propiedades existentes (res_id != False → son por-registro)
-    properties = env['ir.property'].search([
-        ('fields_id', '=', field.id),
-        ('res_id', '!=', False),
-    ])
+    if not rows:
+        print("[tnet_product_profitability] No hay valores en ir_property para migrar")
+        return
 
     migrated = 0
     errors = []
 
-    for prop in properties:
+    for res_id_str, value_float, company_id in rows:
         # res_id tiene el formato 'product.template,42'
         try:
-            record_id = int(prop.res_id.split(',')[1])
+            record_id = int(res_id_str.split(',')[1])
         except (IndexError, ValueError):
-            errors.append(f"res_id inválido: {prop.res_id}")
+            errors.append(f"res_id inválido: {res_id_str}")
             continue
 
-        company = prop.company_id or env.company
-        template = env['product.template'].with_company(company).browse(record_id)
-
-        if not template.exists():
+        if value_float is None:
             continue
 
+        # Escribir directamente en la columna de la tabla (v18: columna directa, no ir_property)
+        # La columna en product_template se llama igual que el campo
         try:
-            template.property_profitability_percentage = prop.value_float
-            migrated += 1
+            cr.execute("""
+                UPDATE product_template
+                SET property_profitability_percentage = %s
+                WHERE id = %s
+            """, (value_float, record_id))
+            if cr.rowcount:
+                migrated += 1
         except Exception as e:
             errors.append(f"product.template id={record_id}: {e}")
 
-    # Eliminar los registros de ir.property migrados
-    properties.unlink()
+    # Limpiar ir_property para este campo
+    cr.execute("DELETE FROM ir_property WHERE fields_id = %s", (field_id,))
 
     print(f"[tnet_product_profitability] Migrados: {migrated} valores de property_profitability_percentage")
     if errors:
