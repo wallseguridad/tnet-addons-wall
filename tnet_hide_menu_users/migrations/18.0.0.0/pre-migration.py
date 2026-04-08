@@ -26,6 +26,23 @@ def migrate(cr, version):
     print(f"[wall pre-migration] Vistas huérfanas (padre inexistente): {cr.rowcount} eliminadas")
 
     # -------------------------------------------------------------------------
+    # 1b. Eliminar vistas inherited que NO están en ir_model_data
+    #     Estas son views "fantasma" de v15 sin trackeabilidad de módulo.
+    #     Odoo las deja en DB pero cuando su padre es eliminado por _process_end
+    #     (upgrade del módulo padre), falla con FK violation.
+    #     Si una view inherited no está en ir_model_data, no pertenece a ningún
+    #     módulo activo y no debería existir.
+    # -------------------------------------------------------------------------
+    cr.execute("""
+        DELETE FROM ir_ui_view
+        WHERE inherit_id IS NOT NULL
+          AND id NOT IN (
+              SELECT res_id FROM ir_model_data WHERE model = 'ir.ui.view'
+          )
+    """)
+    print(f"[wall pre-migration] Vistas inherited sin ir_model_data (fantasmas v15): {cr.rowcount} eliminadas")
+
+    # -------------------------------------------------------------------------
     # 2. Eliminar vistas inherited de modelos que fueron removidos o
     #    restructurados en Odoo v16/v17/v18
     # -------------------------------------------------------------------------
@@ -64,6 +81,7 @@ def migrate(cr, version):
         'action_open_related_document',   # eliminado/renombrado en v18 de account.move.line
         'l10n_latam_check_number',        # removido de account.payment.register en v18
         '1-line.discount / 100.0',        # l10n_ar_sale: t-esc removido del portal template en v18
+        'tax_groups_totals',              # template renombrado en v18 de account module
     ]
     for ref in removed_references:
         cr.execute("""
@@ -121,17 +139,24 @@ def migrate(cr, version):
         'tnet_manual_currency_rate',      # reemplazado por manual_currency_rate (gc)
         'tnet_product_multi_currency',    # reemplazado por product_multi_currency (gc)
     ]
-    # Las vistas no tienen columna `module` directa — está en ir_model_data
+    # Las vistas no tienen columna `module` directa — está en ir_model_data.
+    # IMPORTANTE: se ELIMINAN (no solo desactivan) con CTE recursivo para
+    # borrar también los hijos que las referencian — evita FK violation
+    # cuando Odoo's _process_end intenta limpiar ir_model_data restante.
     cr.execute("""
-        UPDATE ir_ui_view SET active = FALSE
-        WHERE active = TRUE
-          AND id IN (
-              SELECT res_id FROM ir_model_data
-              WHERE model = 'ir.ui.view'
-                AND module = ANY(%s)
-          )
+        WITH RECURSIVE view_tree AS (
+            SELECT res_id AS id
+            FROM ir_model_data
+            WHERE model = 'ir.ui.view'
+              AND module = ANY(%s)
+            UNION ALL
+            SELECT child.id
+            FROM ir_ui_view child
+            JOIN view_tree parent ON child.inherit_id = parent.id
+        )
+        DELETE FROM ir_ui_view WHERE id IN (SELECT id FROM view_tree)
     """, (gone_modules,))
-    print(f"[wall pre-migration] Vistas de módulos eliminados en v18: {cr.rowcount} desactivadas")
+    print(f"[wall pre-migration] Vistas de módulos eliminados en v18: {cr.rowcount} eliminadas (con hijos)")
 
     # -------------------------------------------------------------------------
     # 5. Limpiar ir.model.data de módulos que ya no existen
