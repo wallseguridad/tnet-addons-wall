@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+
+    <!-- Fix 1: Permitir editar tasas de cambio en state='sale' -->
+    <record id="wall_sale_currency_rate_form" model="ir.ui.view">
+      <field name="name">wall.sale.currency.rate.form</field>
+      <field name="model">sale.order</field>
+      <field name="inherit_id" ref="manual_currency_rate_sale.currency_rate_sale_order_form_view"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='l10n_ar_currency_rate_ids']" position="attributes">
+          <attribute name="readonly">state in ['done', 'cancel']</attribute>
+        </xpath>
+      </field>
+    </record>
+
+    <!-- Fix 2: Permitir editar lista de precios en state='sale' -->
+    <record id="wall_sale_pricelist_editable_form" model="ir.ui.view">
+      <field name="name">wall.sale.pricelist.editable.form</field>
+      <field name="model">sale.order</field>
+      <field name="inherit_id" ref="sale.view_order_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='pricelist_id']" position="attributes">
+          <attribute name="readonly">state in ['done', 'cancel']</attribute>
+        </xpath>
+      </field>
+    </record>
+
+  </data>
+</odoo>
