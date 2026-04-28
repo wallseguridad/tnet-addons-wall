@@ -8,6 +8,7 @@
     'category': 'Sales',
     'depends': [
         'manual_currency_rate_sale',
+        'sale_order_general_discount',
     ],
     'data': [
         'views/sale_order_views.xml',

@@ -26,5 +26,21 @@
       </field>
     </record>
 
+    <!-- Fix 3: sale_order_general_discount (OCA) inyecta {'default_discount': general_discount}
+         en el contexto de order_line via get_view. En Odoo 18, OWL evalúa ese contexto durante
+         Record._setData, antes de que general_discount esté disponible porque order_line aparece
+         antes en el arch. Este xpath lo agrega como campo invisible antes de order_line para
+         garantizar que esté en el eval context cuando se evalúe el contexto de order_line. -->
+    <record id="wall_general_discount_eval_context_fix" model="ir.ui.view">
+      <field name="name">wall.general.discount.eval.context.fix</field>
+      <field name="model">sale.order</field>
+      <field name="inherit_id" ref="sale.view_order_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='order_line']" position="before">
+          <field name="general_discount" invisible="1"/>
+        </xpath>
+      </field>
+    </record>
+
   </data>
 </odoo>
