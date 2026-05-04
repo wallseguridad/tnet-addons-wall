@@ -83,6 +83,7 @@ def migrate(cr, version):
         'l10n_latam_check_number',        # removido de account.payment.register en v18
         '1-line.discount / 100.0',        # l10n_ar_sale: t-esc removido del portal template en v18
         'tax_groups_totals',              # template renombrado en v18 de account module
+        'invoice_status_posted',          # elemento QWeb de reporte de factura renombrado/removido en v18
     ]
     for ref in removed_references:
         cr.execute("""
