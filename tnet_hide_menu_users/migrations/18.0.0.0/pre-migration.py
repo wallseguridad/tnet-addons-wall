@@ -113,7 +113,7 @@ def migrate(cr, version):
         'web_dashboard',
         'web_kanban_gauge',
         'website_form_project',
-        'social_media',
+        # social_media existe en Odoo 18 Enterprise — NO se marca como gone
         # módulos ADHOC v15 reemplazados por módulos nativos Odoo en v18
         'account_withholding',            # reemplazado por l10n_ar_withholding (nativo)
         'account_withholding_automatic',  # fusionado en l10n_ar_withholding
