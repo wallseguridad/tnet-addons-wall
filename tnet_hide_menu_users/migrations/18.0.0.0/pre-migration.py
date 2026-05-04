@@ -59,6 +59,7 @@ def migrate(cr, version):
         'sale.advance.payment.inv',      # restructurado en v16
         'stock.inventory',               # eliminado en v16 (reemplazado por quants)
         'stock.inventory.line',          # eliminado en v16
+        'account.payment.group',         # eliminado en v18, absorbido por account_payment_pro
     ]
     cr.execute(
         "DELETE FROM ir_ui_view WHERE model = ANY(%s) AND inherit_id IS NOT NULL",
@@ -123,6 +124,8 @@ def migrate(cr, version):
         'meli_oerp_premium',
         'meli_oerp_stock',
         'odoo_connector_api',             # conector usado por meli_oerp
+        # módulos ADHOC v15 absorbidos en v18 por otros módulos (sin código en disco)
+        'account_payment_group',          # absorbido por account_payment_pro; model account.payment.group eliminado
         # módulos GauchoCode — pendientes migración a v18
         'partner_type',
         'product_brand',
@@ -202,7 +205,6 @@ def migrate(cr, version):
     #     y resuelve la cadena de dependencias correctamente.
     # -------------------------------------------------------------------------
     adhoc_modules_to_upgrade = [
-        'account_payment_group',
         'l10n_ar_account_withholding',
         'l10n_latam_check_adhoc',
     ]
