@@ -27,14 +27,12 @@ class SalePricelist(models.Model):
 
     @api.onchange('partner_id')
     def onchange_partner_id(self):
-        res = super(SalePricelist, self).onchange_partner_id()
         values = {}
         self.pricelist_id = False
         if self.partner_pricelist_ids:
             for pr_list in self.partner_id.pricelist_ids:
                 values['pricelist_id'] = (pr_list.id if pr_list else False)
             self.update(values)
-        return res
 
 
 class PricelistInherit(models.Model):
