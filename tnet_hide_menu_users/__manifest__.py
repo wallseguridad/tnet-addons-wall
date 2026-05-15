@@ -2,7 +2,7 @@
 
 {
     "name": "GauchoCode Hide Menu Users",
-    "version": "18.0.0.15",
+    "version": "18.0.0.16",
     "summary": """ 
             Hide Menu Users
             """,
