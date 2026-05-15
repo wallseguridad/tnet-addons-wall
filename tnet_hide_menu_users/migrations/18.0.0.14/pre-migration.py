@@ -12,6 +12,17 @@ def migrate(cr, version):
     if not version:
         return
 
+    # Forzar upgrade de account_tax_settlement para que su _auto_init()
+    # cree las tablas con el schema correcto según el modelo ORM.
+    cr.execute("""
+        UPDATE ir_module_module
+        SET state = 'to upgrade'
+        WHERE name = 'account_tax_settlement'
+          AND state = 'installed'
+    """)
+    if cr.rowcount:
+        print("[wall 18.0.0.14] account_tax_settlement marcado para upgrade")
+
     cr.execute("""
         CREATE TABLE IF NOT EXISTS res_download_files_wizard (
             id SERIAL PRIMARY KEY,
