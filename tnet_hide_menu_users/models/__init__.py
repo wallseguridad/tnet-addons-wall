@@ -1,3 +1,4 @@
 # -*- coding: utf-8 -*-
 
 from . import res_user
+from . import migration_schema_guard
