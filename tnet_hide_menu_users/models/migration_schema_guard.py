@@ -48,4 +48,29 @@ class ResCompany(models.Model):
                 ADD COLUMN IF NOT EXISTS replenishment_base_cost_currency_id INTEGER,
                 ADD COLUMN IF NOT EXISTS replenishment_cost_type VARCHAR
         """)
+        # account_tax_settlement (ADHOC) — TransientModel tables requeridas por
+        # ir_autovacuum; si el módulo está instalado pero _auto_init no corrió
+        # (edge case en upgrade paths) las tablas pueden faltar
+        cr.execute("""
+            CREATE TABLE IF NOT EXISTS res_download_files_wizard (
+                id SERIAL PRIMARY KEY,
+                create_uid INTEGER,
+                create_date TIMESTAMP,
+                write_uid INTEGER,
+                write_date TIMESTAMP,
+                show_arba_warning BOOLEAN
+            )
+        """)
+        cr.execute("""
+            CREATE TABLE IF NOT EXISTS res_download_files_wizard_line (
+                id SERIAL PRIMARY KEY,
+                create_uid INTEGER,
+                create_date TIMESTAMP,
+                write_uid INTEGER,
+                write_date TIMESTAMP,
+                wizard_id INTEGER,
+                txt_filename VARCHAR,
+                txt_binary BYTEA
+            )
+        """)
         return super()._auto_init()
