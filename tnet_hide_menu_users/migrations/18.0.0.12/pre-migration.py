@@ -1,14 +1,13 @@
 # Pre-migration 18.0.0.12: restaurar menús nativos de pagos.
 #
-# Durante la limpieza de account_payment_group (v15) se eliminaron menús que
-# apuntaban a acciones del modelo removido account.payment.group. Si esos menús
-# eran los XMLIDs nativos de account sobreescritos por el módulo legacy, un
-# update posterior de account no necesariamente los recrea.
-#
-# NOTA: usa SQL directo — en pre-migration, account.payment no está en el
+# NOTA 1: usa SQL directo — en pre-migration, account.payment no está en el
 # registry de Odoo (tnet_hide_menu_users depende solo de base y corre primero).
-# Cualquier write ORM sobre ir.actions.act_window dispara _check_model, que
-# rechaza el modelo aunque el valor ya sea correcto.
+#
+# NOTA 2: en Odoo 18 los campos Char con translate=True se almacenan como jsonb.
+# Los campos `name` de ir.actions.act_window e ir.ui.menu son traducibles, por
+# lo que hay que pasarlos como '{"en_US": "valor"}' en SQL directo.
+
+import json
 
 
 def _find_id(cr, module, name, model):
@@ -31,6 +30,8 @@ def _upsert_imd(cr, module, name, model, res_id):
 
 
 def _ensure_action(cr, module, name, action_name, res_model, domain, context):
+    # En Odoo 18, ir_act_window.name es jsonb (campo traducible)
+    name_json = json.dumps({"en_US": action_name})
     action_id = _find_id(cr, module, name, 'ir.actions.act_window')
     if action_id:
         cr.execute("""
@@ -38,7 +39,7 @@ def _ensure_action(cr, module, name, action_name, res_model, domain, context):
             SET name = %s, res_model = %s, domain = %s, context = %s,
                 view_mode = 'list,form', target = 'current'
             WHERE id = %s
-        """, (action_name, res_model, domain, context, action_id))
+        """, (name_json, res_model, domain, context, action_id))
         print(f"[wall 18.0.0.12] act_window {module}.{name} actualizada (id={action_id})")
     else:
         cr.execute("""
@@ -48,7 +49,7 @@ def _ensure_action(cr, module, name, action_name, res_model, domain, context):
             VALUES (%s, 'ir.actions.act_window', %s, %s, %s, 'list,form', 'current',
                     1, 1, NOW(), NOW())
             RETURNING id
-        """, (action_name, res_model, domain, context))
+        """, (name_json, res_model, domain, context))
         action_id = cr.fetchone()[0]
         _upsert_imd(cr, module, name, 'ir.actions.act_window', action_id)
         print(f"[wall 18.0.0.12] act_window {module}.{name} creada (id={action_id})")
@@ -65,6 +66,8 @@ def _get_parent_menu_id(cr, *xmlids):
 
 
 def _ensure_menu(cr, module, name, menu_name, parent_id, action_id, sequence=20):
+    # En Odoo 18, ir_ui_menu.name es jsonb (campo traducible)
+    name_json = json.dumps({"en_US": menu_name})
     action_ref = f'ir.actions.act_window,{action_id}'
     menu_id = _find_id(cr, module, name, 'ir.ui.menu')
     if menu_id:
@@ -72,7 +75,7 @@ def _ensure_menu(cr, module, name, menu_name, parent_id, action_id, sequence=20)
             UPDATE ir_ui_menu
             SET name = %s, parent_id = %s, action = %s, sequence = %s, active = TRUE
             WHERE id = %s
-        """, (menu_name, parent_id, action_ref, sequence, menu_id))
+        """, (name_json, parent_id, action_ref, sequence, menu_id))
         print(f"[wall 18.0.0.12] menú {module}.{name} actualizado (id={menu_id})")
     else:
         cr.execute("""
@@ -80,7 +83,7 @@ def _ensure_menu(cr, module, name, menu_name, parent_id, action_id, sequence=20)
                 (name, parent_id, action, sequence, active, create_uid, write_uid, create_date, write_date)
             VALUES (%s, %s, %s, %s, TRUE, 1, 1, NOW(), NOW())
             RETURNING id
-        """, (menu_name, parent_id, action_ref, sequence))
+        """, (name_json, parent_id, action_ref, sequence))
         menu_id = cr.fetchone()[0]
         _upsert_imd(cr, module, name, 'ir.ui.menu', menu_id)
         print(f"[wall 18.0.0.12] menú {module}.{name} creado (id={menu_id})")
