@@ -1,41 +1,9 @@
 # -*- coding: utf-8 -*-
-from lxml import etree
-
 from odoo import api, models
 
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
-
-    @api.model
-    def get_view(self, view_id=None, view_type='form', **options):
-        res = super().get_view(view_id=view_id, view_type=view_type, **options)
-        if view_type != 'form' or not res.get('arch'):
-            return res
-
-        # sale_order_general_discount injecta dinámicamente:
-        #   {'default_discount': general_discount, ...}
-        # En Odoo 18 OWL puede evaluar el contexto antes de que el campo esté
-        # disponible en el eval context, provocando NameError. Dejamos el valor
-        # seguro en 0.0; el módulo OCA igualmente recalcula el descuento de la
-        # línea desde order_id.general_discount en sale.order.line.
-        arch = etree.XML(res['arch'])
-        changed = False
-        for order_line in arch.xpath("//field[@name='order_line'][@context]"):
-            context = order_line.attrib.get('context') or ''
-            sanitized = context.replace(
-                "'default_discount': general_discount, ",
-                "'default_discount': 0.0, ",
-            ).replace(
-                '"default_discount": general_discount, ',
-                '"default_discount": 0.0, ',
-            )
-            if sanitized != context:
-                order_line.attrib['context'] = sanitized
-                changed = True
-        if changed:
-            res['arch'] = etree.tostring(arch, encoding='unicode')
-        return res
 
     def write(self, vals):
         if 'l10n_ar_currency_rate_ids' not in vals:
