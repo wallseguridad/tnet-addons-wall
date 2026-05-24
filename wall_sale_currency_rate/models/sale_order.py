@@ -61,3 +61,6 @@ class SaleOrder(models.Model):
             if order.state == 'sale' and order.pricelist_id:
                 ctx = order._get_currency_manual_rates_context()
                 order.with_context(**ctx)._l10n_ar_apply_sale_state_prices()
+                # Evitar que aparezca el banner "Actualizar precios" en órdenes
+                # confirmadas: el repricing por TC ya se aplicó automáticamente.
+                order.show_update_pricelist = False
