@@ -2,7 +2,7 @@
 
 {
     'name': "Wall User Restrictrions",
-    'version': '18.0.2.0.1',
+    'version': '18.0.2.0.2',
     'description': """Wall User Restrictrions""",
     'summary': "Wall User Restrictrions",
     'author': 'GauchoCode',
