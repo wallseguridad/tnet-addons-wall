@@ -10,7 +10,7 @@
 
     "support": "support@gauchocode.com",
 
-    "version": "18.0.0.1.1",
+    "version": "18.0.0.1.2",
 
     "category": "Sales",
 

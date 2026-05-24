@@ -15,8 +15,11 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form" />
         <field name="arch" type="xml">
+            <field name="pricelist_id" position="attributes">
+                <attribute name="domain">['|', ('company_id', '=', False), ('company_id', '=', company_id), ('id', 'in', partner_pricelist_ids)]</attribute>
+            </field>
             <field name="pricelist_id" position="after">
-                <field name="partner_pricelist_ids" domain="[('active','=',True)]" widget="many2many_tags" invisible="1"/>
+                <field name="partner_pricelist_ids" invisible="1"/>
             </field>
         </field>
     </record>
