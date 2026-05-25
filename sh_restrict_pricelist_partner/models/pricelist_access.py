@@ -27,7 +27,9 @@ class SalePricelist(models.Model):
 
     @api.onchange('partner_id')
     def onchange_partner_id(self):
-        res = super().onchange_partner_id()
+        # onchange_partner_id fue eliminado en Odoo 18; llamamos super() solo si existe
+        parent = super()
+        res = parent.onchange_partner_id() if hasattr(parent, 'onchange_partner_id') else None
         values = {}
         if self.partner_pricelist_ids:
             self.pricelist_id = False
