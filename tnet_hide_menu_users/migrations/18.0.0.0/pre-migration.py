@@ -128,10 +128,8 @@ def migrate(cr, version):
         # módulos ADHOC v15 absorbidos en v18 por otros módulos (sin código en disco)
         'account_payment_group',          # absorbido por account_payment_pro; model account.payment.group eliminado
         # módulos GauchoCode — pendientes migración a v18
-        'partner_type',
         'product_brand',
         'product_profitability_fix',
-        'product_sap_code',
         'purchase_discount',
         # módulos custom v15 pendientes de migración
         'website_price_tax_custom',
