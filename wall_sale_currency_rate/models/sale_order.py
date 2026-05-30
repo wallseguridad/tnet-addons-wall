@@ -54,6 +54,17 @@ class SaleOrder(models.Model):
 
         return result
 
+    @api.onchange('l10n_ar_currency_rate_ids')
+    def _onchange_l10n_ar_currency_rate_ids(self):
+        # Para órdenes confirmadas, el onchange no tiene acceso al valor
+        # almacenado de l10n_ar_price_unit_usd (no está en la vista) → llega
+        # como 0 → los precios se zerean. El write() ya maneja el repricing
+        # con acceso real a DB. Hacemos no-op aquí para confirmadas.
+        for order in self:
+            if order.state == 'sale':
+                return
+        return super()._onchange_l10n_ar_currency_rate_ids()
+
     @api.onchange('pricelist_id')
     def _onchange_pricelist_id_wall(self):
         """Disparar repricing cuando cambia la lista de precios en state='sale'."""
