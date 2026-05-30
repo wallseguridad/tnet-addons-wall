@@ -139,7 +139,7 @@ def migrate(cr, version):
         'website_sale_comparison_hide_price',
         'studio_customization',
         'tnet_manual_currency_rate',      # reemplazado por manual_currency_rate (gc)
-        'tnet_product_multi_currency',    # reemplazado por product_multi_currency (gc)
+        # tnet_product_multi_currency excluido: shim module en disco migra currencies v15→v18
     ]
     # Las vistas no tienen columna `module` directa — está en ir_model_data.
     # IMPORTANTE: se ELIMINAN (no solo desactivan) con CTE recursivo para
