@@ -39,16 +39,8 @@ def migrate(cr, version):
                ORDER BY pp.id
                LIMIT 1
            )
-         WHERE (t.business_cost IS NULL OR t.business_cost = 0)
-           AND EXISTS (
-               SELECT 1 FROM product_product pp
-               WHERE pp.product_tmpl_id = t.id
-                 AND pp.standard_price IS NOT NULL
-                 AND pp.standard_price->>%s IS NOT NULL
-                 AND (pp.standard_price->>%s)::double precision != 0
-           )
         """,
-        (main_company_id, main_company_id, main_company_id),
+        (main_company_id,),
     )
     print(f"[wall 18.0.0.19] business_cost ← standard_price (empresa {main_company_id}): {cr.rowcount} productos")
 
@@ -58,9 +50,6 @@ def migrate(cr, version):
         """
         UPDATE product_template
            SET business_markup_rate = property_profitability_percentage
-         WHERE (business_markup_rate IS NULL OR business_markup_rate = 0)
-           AND property_profitability_percentage IS NOT NULL
-           AND property_profitability_percentage != 0
         """
     )
     print(f"[wall 18.0.0.19] business_markup_rate ← property_profitability_percentage: {cr.rowcount} productos")
