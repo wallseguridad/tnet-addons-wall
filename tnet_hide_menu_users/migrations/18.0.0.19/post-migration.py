@@ -1,12 +1,11 @@
-# Post-migration 18.0.0.19: poblar business_cost desde replenishment_base_cost.
+# Post-migration 18.0.0.19: poblar business_cost / business_markup_rate desde v15.
 #
-# business_cost es un campo nuevo en v18 (product_multi_currency). No existía
-# en v15. El equivalente conceptual en v15 era replenishment_base_cost (el costo
-# base del producto en su moneda).
+# business_cost y business_markup_rate son campos nuevos en v18 (product_multi_currency).
+# No existían en v15. Sus fuentes en v15 son:
 #
-# Una vez poblado, _sync_standard_price_with_business_cost y
-# _sync_list_price_with_business_price (product_multi_currency) se encargan
-# de propagar el valor a standard_price y list_price.
+#   business_cost          ← standard_price  (product_product, ya migrado por Odoo)
+#   business_cost_currency_id ← business_cost_currency_id (ya migrado desde property_cost_currency_id)
+#   business_markup_rate   ← property_profitability_percentage (product_template)
 
 
 def migrate(cr, version):
@@ -17,36 +16,46 @@ def migrate(cr, version):
     cr.execute(
         """
         ALTER TABLE product_template
-            ADD COLUMN IF NOT EXISTS business_cost DOUBLE PRECISION,
-            ADD COLUMN IF NOT EXISTS business_cost_currency_id INTEGER
+            ADD COLUMN IF NOT EXISTS business_cost        DOUBLE PRECISION,
+            ADD COLUMN IF NOT EXISTS business_cost_currency_id INTEGER,
+            ADD COLUMN IF NOT EXISTS business_markup_rate DOUBLE PRECISION
         """
     )
 
-    # Poblar business_cost desde replenishment_base_cost donde esté vacío
+    # business_cost ← standard_price del primer variant activo
+    # standard_price ya fue migrado por Odoo desde ir.property → product_product
+    cr.execute(
+        """
+        UPDATE product_template t
+           SET business_cost = (
+               SELECT pp.standard_price
+               FROM product_product pp
+               WHERE pp.product_tmpl_id = t.id
+               ORDER BY pp.id
+               LIMIT 1
+           )
+         WHERE (t.business_cost IS NULL OR t.business_cost = 0)
+           AND EXISTS (
+               SELECT 1 FROM product_product pp
+               WHERE pp.product_tmpl_id = t.id
+                 AND pp.standard_price IS NOT NULL
+                 AND pp.standard_price != 0
+           )
+        """
+    )
+    print(f"[wall 18.0.0.19] business_cost ← standard_price: {cr.rowcount} productos")
+
+    # business_markup_rate ← property_profitability_percentage
+    # (ya migrado a columna directa por tnet_product_profitability o aún en tabla)
     cr.execute(
         """
         UPDATE product_template
-           SET business_cost = replenishment_base_cost
-         WHERE (business_cost IS NULL OR business_cost = 0)
-           AND replenishment_base_cost IS NOT NULL
-           AND replenishment_base_cost != 0
+           SET business_markup_rate = property_profitability_percentage
+         WHERE (business_markup_rate IS NULL OR business_markup_rate = 0)
+           AND property_profitability_percentage IS NOT NULL
+           AND property_profitability_percentage != 0
         """
     )
-    cost_count = cr.rowcount
-    print(f"[wall 18.0.0.19] business_cost ← replenishment_base_cost: {cost_count} productos")
+    print(f"[wall 18.0.0.19] business_markup_rate ← property_profitability_percentage: {cr.rowcount} productos")
 
-    # Poblar business_cost_currency_id desde replenishment_base_cost_currency_id
-    # donde business_cost fue recién populado y la moneda está vacía
-    cr.execute(
-        """
-        UPDATE product_template
-           SET business_cost_currency_id = replenishment_base_cost_currency_id
-         WHERE (business_cost_currency_id IS NULL)
-           AND replenishment_base_cost_currency_id IS NOT NULL
-           AND replenishment_base_cost != 0
-        """
-    )
-    currency_count = cr.rowcount
-    print(f"[wall 18.0.0.19] business_cost_currency_id ← replenishment_base_cost_currency_id: {currency_count} productos")
-
-    print(f"[wall 18.0.0.19] Migración completada.")
+    print("[wall 18.0.0.19] Migración completada.")
