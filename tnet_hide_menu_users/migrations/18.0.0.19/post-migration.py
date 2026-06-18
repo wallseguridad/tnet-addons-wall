@@ -44,8 +44,7 @@ def migrate(cr, version):
     )
     print(f"[wall 18.0.0.19] business_cost ← standard_price (empresa {main_company_id}): {cr.rowcount} productos")
 
-    # business_markup_rate ← property_profitability_percentage
-    # (ya migrado a columna directa por tnet_product_profitability o aún en tabla)
+    # business_markup_rate ← property_profitability_percentage (jsonb en Odoo 18)
     cr.execute(
         """
         UPDATE product_template
@@ -54,5 +53,18 @@ def migrate(cr, version):
         (main_company_id,),
     )
     print(f"[wall 18.0.0.19] business_markup_rate ← property_profitability_percentage: {cr.rowcount} productos")
+
+    # business_cost_currency_id: la mayoría de productos en v15 usaban la moneda
+    # de la empresa por defecto (sin registro en ir.property). Setear fallback donde NULL.
+    cr.execute(
+        """
+        UPDATE product_template
+           SET business_cost_currency_id = (
+               SELECT currency_id FROM res_company ORDER BY id LIMIT 1
+           )
+         WHERE business_cost_currency_id IS NULL
+        """
+    )
+    print(f"[wall 18.0.0.19] business_cost_currency_id ← moneda empresa (fallback): {cr.rowcount} productos")
 
     print("[wall 18.0.0.19] Migración completada.")
