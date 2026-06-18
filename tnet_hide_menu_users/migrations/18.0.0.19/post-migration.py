@@ -22,13 +22,18 @@ def migrate(cr, version):
         """
     )
 
-    # business_cost ← standard_price del primer variant activo
-    # standard_price ya fue migrado por Odoo desde ir.property → product_product
+    # standard_price en Odoo 18 es company_dependent → jsonb {"company_id": value}
+    # Extraemos el valor de la compañía principal (la de menor id)
+    cr.execute("SELECT id FROM res_company ORDER BY id LIMIT 1")
+    row = cr.fetchone()
+    main_company_id = str(row[0]) if row else "1"
+
+    # business_cost ← standard_price del primer variant (jsonb → float)
     cr.execute(
         """
         UPDATE product_template t
            SET business_cost = (
-               SELECT pp.standard_price
+               SELECT (pp.standard_price->>%s)::double precision
                FROM product_product pp
                WHERE pp.product_tmpl_id = t.id
                ORDER BY pp.id
@@ -39,11 +44,13 @@ def migrate(cr, version):
                SELECT 1 FROM product_product pp
                WHERE pp.product_tmpl_id = t.id
                  AND pp.standard_price IS NOT NULL
-                 AND pp.standard_price != 0
+                 AND pp.standard_price->>%s IS NOT NULL
+                 AND (pp.standard_price->>%s)::double precision != 0
            )
-        """
+        """,
+        (main_company_id, main_company_id, main_company_id),
     )
-    print(f"[wall 18.0.0.19] business_cost ← standard_price: {cr.rowcount} productos")
+    print(f"[wall 18.0.0.19] business_cost ← standard_price (empresa {main_company_id}): {cr.rowcount} productos")
 
     # business_markup_rate ← property_profitability_percentage
     # (ya migrado a columna directa por tnet_product_profitability o aún en tabla)
