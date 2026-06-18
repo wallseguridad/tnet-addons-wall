@@ -54,17 +54,14 @@ def migrate(cr, version):
     )
     print(f"[wall 18.0.0.19] business_markup_rate ← property_profitability_percentage: {cr.rowcount} productos")
 
-    # business_cost_currency_id: la mayoría de productos en v15 usaban la moneda
-    # de la empresa por defecto (sin registro en ir.property). Setear fallback donde NULL.
+    # business_cost_currency_id ← force_currency_id (= property_currency_id migrado)
     cr.execute(
         """
         UPDATE product_template
-           SET business_cost_currency_id = (
-               SELECT currency_id FROM res_company ORDER BY id LIMIT 1
-           )
-         WHERE business_cost_currency_id IS NULL
+           SET business_cost_currency_id = force_currency_id
+         WHERE force_currency_id IS NOT NULL
         """
     )
-    print(f"[wall 18.0.0.19] business_cost_currency_id ← moneda empresa (fallback): {cr.rowcount} productos")
+    print(f"[wall 18.0.0.19] business_cost_currency_id ← force_currency_id: {cr.rowcount} productos")
 
     print("[wall 18.0.0.19] Migración completada.")
