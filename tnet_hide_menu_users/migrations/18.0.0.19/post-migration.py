@@ -13,6 +13,15 @@ def migrate(cr, version):
     if not version:
         return
 
+    # Pre-crear columnas en caso de que product_multi_currency aún no las haya creado
+    cr.execute(
+        """
+        ALTER TABLE product_template
+            ADD COLUMN IF NOT EXISTS business_cost DOUBLE PRECISION,
+            ADD COLUMN IF NOT EXISTS business_cost_currency_id INTEGER
+        """
+    )
+
     # Poblar business_cost desde replenishment_base_cost donde esté vacío
     cr.execute(
         """
