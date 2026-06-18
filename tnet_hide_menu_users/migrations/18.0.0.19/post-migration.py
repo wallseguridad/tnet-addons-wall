@@ -49,8 +49,9 @@ def migrate(cr, version):
     cr.execute(
         """
         UPDATE product_template
-           SET business_markup_rate = property_profitability_percentage
-        """
+           SET business_markup_rate = (property_profitability_percentage->>%s)::double precision
+        """,
+        (main_company_id,),
     )
     print(f"[wall 18.0.0.19] business_markup_rate ← property_profitability_percentage: {cr.rowcount} productos")
 
