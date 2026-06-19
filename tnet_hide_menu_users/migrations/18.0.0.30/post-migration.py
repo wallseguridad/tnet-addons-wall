@@ -85,9 +85,12 @@ def migrate(cr, version):
 
     # -------------------------------------------------------------------------
     # 5. business_cost_currency_id ← property_currency_id (ir.property)
-    #    En v15, la moneda del producto estaba en ir.property como Many2one.
-    #    force_currency_id (el equivalente v18) aún no existe en este punto
-    #    del upgrade, así que leemos directo de ir_property.
+    #    En v15, la moneda del producto (precio y costo) estaba en ir.property
+    #    como Many2one. No usamos JOIN a ir_model_fields porque Odoo puede
+    #    haber limpiado esas entradas durante el upgrade del módulo — en ese
+    #    caso el JOIN devuelve 0 filas sin error ni aviso.
+    #    En cambio, buscamos por patrón directo: res_id = 'product.template,N'
+    #    y value_reference = 'res.currency,N'.
     # -------------------------------------------------------------------------
     cr.execute(
         """
@@ -100,15 +103,28 @@ def migrate(cr, version):
         print("[wall 18.0.0.30] ir_property no existe, saltando business_cost_currency_id")
         return
 
+    # Diagnóstico: ¿cuántas filas de moneda hay en ir_property para product.template?
     cr.execute(
         """
-        SELECT p.res_id, p.value_reference
-        FROM ir_property p
-        JOIN ir_model_fields f ON f.id = p.fields_id
-        WHERE f.name = 'property_currency_id'
-          AND p.res_id IS NOT NULL AND p.res_id != ''
-          AND p.type = 'many2one'
-          AND p.value_reference IS NOT NULL
+        SELECT COUNT(*)
+        FROM ir_property
+        WHERE type = 'many2one'
+          AND value_reference LIKE 'res.currency,%%'
+          AND res_id LIKE 'product.template,%%'
+        """
+    )
+    total_currency_rows = cr.fetchone()[0]
+    print(f"[wall 18.0.0.30] ir_property filas de moneda para product.template: {total_currency_rows}")
+
+    cr.execute(
+        """
+        SELECT res_id, value_reference
+        FROM ir_property
+        WHERE type = 'many2one'
+          AND value_reference LIKE 'res.currency,%%'
+          AND res_id LIKE 'product.template,%%'
+          AND res_id IS NOT NULL AND res_id != ''
+          AND value_reference IS NOT NULL
         """
     )
     rows = cr.fetchall()
