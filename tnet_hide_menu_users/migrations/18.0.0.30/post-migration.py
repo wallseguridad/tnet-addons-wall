@@ -1,14 +1,13 @@
 # Post-migration 18.0.0.30: migración de costos y precios de productos v15 → v18.
 #
-# Responsabilidades de este script (corre primero — solo depende de base):
-#   business_cost ← standard_price (Odoo ya migró ir_property → jsonb antes de las post-migrations)
+# HALLAZGO CLAVE: Odoo elimina ir_property completamente ANTES de ejecutar las
+# post-migrations. Los datos v15 de campos company_dependent ya están migrados
+# a columnas jsonb {"company_id": value} cuando este script corre.
 #
-# Responsabilidades delegadas a los shims (corren después, con los campos ya definidos):
-#   business_cost_currency_id ← tnet_product_multi_currency shim (property_cost_currency_id)
-#   business_markup_rate      ← tnet_product_profitability (property_profitability_percentage)
-#
-# NOTA: las columnas se pre-crean aquí porque product_multi_currency puede
-# no haber corrido todavía su ORM update cuando este script ejecuta.
+# Fuentes en v18 (todas como jsonb en product_template):
+#   business_cost             ← standard_price         (en product_product)
+#   business_cost_currency_id ← property_cost_currency_id  (integer)
+#   business_markup_rate      ← property_profitability_percentage (float)
 
 
 def migrate(cr, version):
@@ -61,4 +60,35 @@ def migrate(cr, version):
         (main_company_id,),
     )
     print(f"[wall 18.0.0.30] business_cost ← standard_price: {cr.rowcount} productos actualizados")
+
+    # -------------------------------------------------------------------------
+    # 4. business_cost_currency_id ← property_cost_currency_id (jsonb)
+    #    Odoo migra automáticamente ir_property → columna jsonb durante el
+    #    upgrade. Misma extracción que standard_price.
+    # -------------------------------------------------------------------------
+    cr.execute(
+        """
+        UPDATE product_template
+           SET business_cost_currency_id = (property_cost_currency_id->>%s)::integer
+         WHERE property_cost_currency_id IS NOT NULL
+           AND (property_cost_currency_id->>%s) IS NOT NULL
+        """,
+        (main_company_id, main_company_id),
+    )
+    print(f"[wall 18.0.0.30] business_cost_currency_id ← property_cost_currency_id: {cr.rowcount} productos actualizados")
+
+    # -------------------------------------------------------------------------
+    # 5. business_markup_rate ← property_profitability_percentage (jsonb)
+    # -------------------------------------------------------------------------
+    cr.execute(
+        """
+        UPDATE product_template
+           SET business_markup_rate = (property_profitability_percentage->>%s)::double precision
+         WHERE property_profitability_percentage IS NOT NULL
+           AND (property_profitability_percentage->>%s) IS NOT NULL
+        """,
+        (main_company_id, main_company_id),
+    )
+    print(f"[wall 18.0.0.30] business_markup_rate ← property_profitability_percentage: {cr.rowcount} productos actualizados")
+
     print("[wall 18.0.0.30] Migración completada.")

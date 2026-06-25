@@ -43,45 +43,31 @@ def migrate(cr, version):
         """)
         has_business_cost_currency = cr.fetchone()[0]
 
-        # Leer monedas de ir_property por patrón directo — sin JOIN a ir_model_fields.
-        # El JOIN falla si Odoo eliminó esas entradas durante el upgrade del shim.
-        # property_currency_id y property_cost_currency_id siempre tienen el mismo
-        # valor por producto; con DISTINCT evitamos procesar duplicados.
-        cr.execute("""
-            SELECT DISTINCT res_id, value_reference
-            FROM ir_property
-            WHERE type = 'many2one'
-              AND value_reference LIKE 'res.currency,%%'
-              AND res_id LIKE 'product.template,%%'
-              AND res_id IS NOT NULL AND res_id != ''
-              AND value_reference IS NOT NULL
-        """)
-        migrated_force = 0
-        migrated_cost = 0
-        for res_id_str, value_ref in cr.fetchall():
-            try:
-                template_id = int(res_id_str.split(',')[1])
-                currency_id = int(value_ref.split(',')[1])
-            except (IndexError, ValueError):
-                continue
-            if has_force_currency:
-                cr.execute(
-                    "UPDATE product_template SET force_currency_id = %s WHERE id = %s AND force_currency_id IS NULL",
-                    (currency_id, template_id)
-                )
-                if cr.rowcount:
-                    migrated_force += 1
-            if has_business_cost_currency:
-                cr.execute(
-                    "UPDATE product_template SET business_cost_currency_id = %s WHERE id = %s AND business_cost_currency_id IS NULL",
-                    (currency_id, template_id)
-                )
-                if cr.rowcount:
-                    migrated_cost += 1
+        # Migrar monedas desde columnas jsonb (Odoo eliminó ir_property antes de las post-migrations).
+        # property_currency_id y property_cost_currency_id ya están como jsonb {"company_id": currency_id}.
+        cr.execute("SELECT id FROM res_company ORDER BY id LIMIT 1")
+        row = cr.fetchone()
+        main_company_id = str(row[0]) if row else "1"
+
         if has_force_currency:
-            print(f"[tnet_product_multi_currency shim] property_currency_id → force_currency_id: {migrated_force} productos")
+            cr.execute("""
+                UPDATE product_template
+                   SET force_currency_id = (property_currency_id->>%s)::integer
+                 WHERE property_currency_id IS NOT NULL
+                   AND (property_currency_id->>%s) IS NOT NULL
+                   AND force_currency_id IS NULL
+            """, (main_company_id, main_company_id))
+            print(f"[tnet_product_multi_currency shim] property_currency_id → force_currency_id: {cr.rowcount} productos")
+
         if has_business_cost_currency:
-            print(f"[tnet_product_multi_currency shim] property_cost_currency_id → business_cost_currency_id: {migrated_cost} productos")
+            cr.execute("""
+                UPDATE product_template
+                   SET business_cost_currency_id = (property_cost_currency_id->>%s)::integer
+                 WHERE property_cost_currency_id IS NOT NULL
+                   AND (property_cost_currency_id->>%s) IS NOT NULL
+                   AND business_cost_currency_id IS NULL
+            """, (main_company_id, main_company_id))
+            print(f"[tnet_product_multi_currency shim] property_cost_currency_id → business_cost_currency_id: {cr.rowcount} productos")
 
     # -------------------------------------------------------------------------
     # 2. Fallback: setear USD en productos sin moneda asignada
