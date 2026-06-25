@@ -89,3 +89,20 @@ def migrate(cr, version):
         print(f"[tnet_product_profitability] Errores ({len(errors)}):")
         for err in errors:
             print(f"  - {err}")
+
+    # Transferir a business_markup_rate (product_multi_currency v18).
+    # En este punto property_profitability_percentage ya está como columna directa.
+    cr.execute("""
+        SELECT EXISTS (
+            SELECT FROM information_schema.columns
+            WHERE table_name = 'product_template' AND column_name = 'business_markup_rate'
+        )
+    """)
+    if cr.fetchone()[0]:
+        cr.execute("""
+            UPDATE product_template
+               SET business_markup_rate = property_profitability_percentage
+             WHERE property_profitability_percentage IS NOT NULL
+               AND business_markup_rate IS NULL
+        """)
+        print(f"[tnet_product_profitability] business_markup_rate ← property_profitability_percentage: {cr.rowcount} productos")

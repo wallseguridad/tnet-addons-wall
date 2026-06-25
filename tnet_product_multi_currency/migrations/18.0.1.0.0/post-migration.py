@@ -43,56 +43,44 @@ def migrate(cr, version):
         """)
         has_business_cost_currency = cr.fetchone()[0]
 
-        if has_force_currency:
-            # Leer property_currency_id de ir_property buscando por nombre del campo
-            # (ir_model_fields puede ya no tener el registro si fue limpiado antes)
-            cr.execute("""
-                SELECT p.res_id, p.value_reference
-                FROM ir_property p
-                JOIN ir_model_fields f ON f.id = p.fields_id
-                WHERE f.name = 'property_currency_id'
-                  AND p.res_id IS NOT NULL AND p.res_id != ''
-                  AND p.type = 'many2one'
-                  AND p.value_reference IS NOT NULL
-            """)
-            migrated = 0
-            for res_id_str, value_ref in cr.fetchall():
-                try:
-                    template_id = int(res_id_str.split(',')[1])
-                    currency_id = int(value_ref.split(',')[1])
-                except (IndexError, ValueError):
-                    continue
+        # Leer monedas de ir_property por patrón directo — sin JOIN a ir_model_fields.
+        # El JOIN falla si Odoo eliminó esas entradas durante el upgrade del shim.
+        # property_currency_id y property_cost_currency_id siempre tienen el mismo
+        # valor por producto; con DISTINCT evitamos procesar duplicados.
+        cr.execute("""
+            SELECT DISTINCT res_id, value_reference
+            FROM ir_property
+            WHERE type = 'many2one'
+              AND value_reference LIKE 'res.currency,%%'
+              AND res_id LIKE 'product.template,%%'
+              AND res_id IS NOT NULL AND res_id != ''
+              AND value_reference IS NOT NULL
+        """)
+        migrated_force = 0
+        migrated_cost = 0
+        for res_id_str, value_ref in cr.fetchall():
+            try:
+                template_id = int(res_id_str.split(',')[1])
+                currency_id = int(value_ref.split(',')[1])
+            except (IndexError, ValueError):
+                continue
+            if has_force_currency:
                 cr.execute(
                     "UPDATE product_template SET force_currency_id = %s WHERE id = %s AND force_currency_id IS NULL",
                     (currency_id, template_id)
                 )
                 if cr.rowcount:
-                    migrated += 1
-            print(f"[tnet_product_multi_currency shim] property_currency_id → force_currency_id: {migrated} productos")
-
-        if has_business_cost_currency:
-            cr.execute("""
-                SELECT p.res_id, p.value_reference
-                FROM ir_property p
-                JOIN ir_model_fields f ON f.id = p.fields_id
-                WHERE f.name = 'property_cost_currency_id'
-                  AND p.res_id IS NOT NULL AND p.res_id != ''
-                  AND p.type = 'many2one'
-                  AND p.value_reference IS NOT NULL
-            """)
-            migrated_cost = 0
-            for res_id_str, value_ref in cr.fetchall():
-                try:
-                    template_id = int(res_id_str.split(',')[1])
-                    currency_id = int(value_ref.split(',')[1])
-                except (IndexError, ValueError):
-                    continue
+                    migrated_force += 1
+            if has_business_cost_currency:
                 cr.execute(
                     "UPDATE product_template SET business_cost_currency_id = %s WHERE id = %s AND business_cost_currency_id IS NULL",
                     (currency_id, template_id)
                 )
                 if cr.rowcount:
                     migrated_cost += 1
+        if has_force_currency:
+            print(f"[tnet_product_multi_currency shim] property_currency_id → force_currency_id: {migrated_force} productos")
+        if has_business_cost_currency:
             print(f"[tnet_product_multi_currency shim] property_cost_currency_id → business_cost_currency_id: {migrated_cost} productos")
 
     # -------------------------------------------------------------------------
