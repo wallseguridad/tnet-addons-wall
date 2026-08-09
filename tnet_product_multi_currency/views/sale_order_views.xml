@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <record id="multi_currency_sale_order_form_view" model="ir.ui.view">
+            <field name="name">multi.currency.sale.order.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='order_line']/list/field[@name='customer_lead']" position="after">
+                    <field name="lst_price" readonly="1" force_save="1"/>
+                    <field name="property_currency_id" readonly="1" force_save="1"/>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form/group/group[1]/field[@name='product_packaging_id']" position="after">
+                    <field name="lst_price" readonly="1" force_save="1"/>
+                    <field name="property_currency_id" readonly="1" force_save="1"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

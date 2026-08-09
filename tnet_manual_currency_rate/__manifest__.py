@@ -1,20 +1,21 @@
 # -*- coding: utf-8 -*-
 
 {
-    'name': "TNET Product Multi Currency",
+    'name': "TNET Manual Currency Rate",
     'version': '18.0.0.1.0',
-    'description': """Product Multi Currency""",
-    'summary': "Product Multi Currency",
+    'description': """Manual Currency Rate in Sale Orders""",
+    'summary': "Manual Currency Rate in Sale Orders",
     'author': 'Luis Trajtenberg',
     'website': 'https://www.tecnicanet.com',
-    'category': "Inventory/Inventory",
-    'depends': ['product', 'sale', 'purchase'],
+    'category': "Localization/Argentina",
+    'depends': ['base', 'sale', 'purchase', 'l10n_ar', 'l10n_ar_ux', 'account_ux'],
     'data': [
         "security/security.xml",
         "security/ir.model.access.csv",
-        "views/product_template_views.xml",
+        "views/currency_views.xml",
         "views/purchase_order_views.xml",
         "views/sale_order_views.xml",
+        "views/account_move_views.xml",
     ],
     'application': False,
     'installable': True,
