@@ -9,9 +9,65 @@ class AccountMove(models.Model):
     l10n_ar_reference_currency_rate = fields.Float(string='Referencia T.C', digits=(16, 6))
     currency_name = fields.Char('Currency Name', related='currency_id.name', readonly=True)
 
+    # Campos base que en v15 venían de los forks Tecnicanet de l10n_ar_ux y
+    # account_ux (reemplazados en v18 por los repos oficiales de Adhoc, que
+    # no traen esta funcionalidad). Se recrean acá porque tnet_manual_currency_rate
+    # depende de ellos.
+    other_currency = fields.Boolean(compute='_compute_other_currency')
+    computed_currency_rate = fields.Float(
+        compute='_compute_currency_rate',
+        string='Currency Rate (preview)',
+        digits=(16, 6),
+    )
+    l10n_ar_currency_rate = fields.Float(compute='_compute_l10n_ar_currency_rate', store=True)
+
+    @api.depends('company_currency_id', 'currency_id')
+    def _compute_other_currency(self):
+        other_currency = self.filtered(lambda x: x.company_currency_id != x.currency_id)
+        other_currency.other_currency = True
+        (self - other_currency).other_currency = False
+
+    @api.depends('reversed_entry_id')
+    def _compute_l10n_ar_currency_rate(self):
+        """ Si es una nota de crédito en moneda extranjera y la moneda extranjera es la
+        misma que la de la factura original, usamos la tasa de la factura original. """
+        ar_reversed_other_currency = self.filtered(
+            lambda x: x.is_invoice() and x.reversed_entry_id and
+            x.company_id.country_id == self.env.ref('base.ar') and
+            x.currency_id != x.company_id.currency_id and
+            x.reversed_entry_id.currency_id == x.currency_id)
+        self.filtered(lambda x: x.move_type == 'entry').l10n_ar_currency_rate = False
+        for rec in ar_reversed_other_currency:
+            rec.l10n_ar_currency_rate = rec.reversed_entry_id.l10n_ar_currency_rate
+
+    @api.depends('currency_id', 'company_id', 'date', 'invoice_date')
+    def _compute_currency_rate(self):
+        need_currency_rate = self.filtered(lambda x: x.currency_id and x.company_id and (x.currency_id != x.company_id.currency_id))
+        remaining = self - need_currency_rate
+        for rec in need_currency_rate:
+            if rec.l10n_ar_currency_rate:
+                rec.computed_currency_rate = rec.l10n_ar_currency_rate
+            else:
+                rec.computed_currency_rate = rec.currency_id._convert(
+                    1.0, rec.company_id.currency_id, rec.company_id,
+                    date=rec.date if rec.invoice_date else fields.Date.context_today(rec),
+                    round=False)
+        remaining.computed_currency_rate = 1.0
+
     @api.onchange('l10n_ar_currency_rate')
     def _onchange_l10n_ar_reference_currency_rate(self):
         self.l10n_ar_reference_currency_rate = self.l10n_ar_currency_rate
+
+
+class AccountMoveLine(models.Model):
+    _inherit = 'account.move.line'
+
+    @api.depends('move_id.l10n_ar_currency_rate')
+    def _compute_currency_rate(self):
+        forced = self.filtered(lambda x: x.move_id.l10n_ar_currency_rate)
+        for rec in forced:
+            rec.currency_rate = 1 / rec.move_id.l10n_ar_currency_rate if (rec.currency_id != rec.move_id.company_currency_id) else 1
+        return super(AccountMoveLine, self - forced)._compute_currency_rate()
 
 
 class AccountChangeCurrency(models.TransientModel):
@@ -107,7 +163,20 @@ class AccountChangeCurrency(models.TransientModel):
 
 
 class AccountMoveChangeRate(models.TransientModel):
+    # account_ux (oficial) ya define _name = 'account.move.change.rate' con
+    # move_id/currency_rate/get_move/_onchange_move/confirm, usando el campo
+    # nativo de v18 invoice_currency_rate. Acá lo extendemos: agregamos
+    # day_rate y reemplazamos _onchange_move/confirm para usar los campos AR
+    # (l10n_ar_currency_rate/computed_currency_rate) en vez del nativo.
     _inherit = 'account.move.change.rate'
+
+    day_rate = fields.Boolean(
+        string="Use currency rate of the day",
+        help="The currency rate on the invoice date will be used. If the invoice does not have a date, the currency rate will be used at the time of validation.")
+
+    @api.onchange('move_id')
+    def _onchange_move(self):
+        self.currency_rate = self.move_id.l10n_ar_currency_rate or self.move_id.computed_currency_rate
 
     def confirm(self):
         move = self.move_id.with_context(check_move_validity=False)
