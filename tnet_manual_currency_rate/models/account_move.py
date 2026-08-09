@@ -71,11 +71,19 @@ class AccountMoveLine(models.Model):
 
 
 class AccountChangeCurrency(models.TransientModel):
+    # change_type existía en el fork Tecnicanet de account_ux y se sacó por
+    # completo en el oficial (que simplificó a un único comportamiento,
+    # equivalente al viejo 'value'). Se recrea acá porque change_currency()
+    # más abajo lo sigue usando.
     _inherit = 'account.change.currency'
 
     currency_from = fields.Char(string='Currency From Name', related='currency_from_id.name')
     currency_to = fields.Char(string='Currency To Name', related='currency_to_id.name')
     currency_rate = fields.Float(digits=(16, 6))
+    change_type = fields.Selection(
+        [('currency', 'Change Only Currency'),
+         ('value', 'Update both currency and values')],
+        default='currency')
     inverse_currency_rate = fields.Float(string='Inverse Rate',
                                          digits=(16, 6),
                                          required=True,

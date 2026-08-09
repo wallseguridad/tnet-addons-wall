@@ -61,17 +61,6 @@
             </field>
         </record>
 
-        <record id="account_manual_change_no_exchange_currency" model="ir.ui.view">
-            <field name="name">account.manual.change.no.exchange.currency</field>
-            <field name="model">account.change.currency</field>
-            <field name="inherit_id" ref="account_ux.view_account_change_no_exchange_currency"/>
-            <field name="arch" type="xml">
-                <field name="currency_rate" position="after">
-                    <field name="inverse_currency_rate" readonly="1" foce_save="1" invisible="1"/>
-                </field>
-            </field>
-        </record>
-
         <record id="account_manual_change_rate_form_view" model="ir.ui.view">
             <field name="name">account.manual.change.rate.form.view</field>
             <field name="model">account.move.change.rate</field>
