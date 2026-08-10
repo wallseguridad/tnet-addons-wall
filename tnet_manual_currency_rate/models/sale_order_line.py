@@ -8,15 +8,11 @@ class SaleOrderLine(models.Model):
 
     l10n_ar_price_unit_usd = fields.Float(string='Price Unit USD', compute='_compute_l10n_ar_price_unit_usd', store=True, digits=(16, 6))
 
-    @api.onchange('product_id')
-    def product_id_change(self):
-        self.env.context = self.order_id.context_manual_rate()
-        return super(SaleOrderLine, self).product_id_change()
-
-    @api.onchange('product_uom', 'product_uom_qty')
-    def product_uom_change(self):
-        self.env.context = self.order_id.context_manual_rate()
-        return super(SaleOrderLine, self).product_uom_change()
+    # product_id_change/product_uom_change ya no existen en v18 (sale.order.line
+    # pasó a precios por @api.depends, ver _compute_price_unit). Solo inyectaban
+    # el contexto de tasa manual antes de recomputar precios; ese contexto ya lo
+    # setea sale_order.py._onchange_l10n_ar_currency_rates() antes de llamar a
+    # update_currency_rate_prices(), así que no hace falta repetirlo acá.
 
     @api.depends('price_unit')
     def _compute_l10n_ar_price_unit_usd(self):

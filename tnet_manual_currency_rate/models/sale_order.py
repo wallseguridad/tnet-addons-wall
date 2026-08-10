@@ -106,16 +106,21 @@ class SaleOrder(models.Model):
                                                                             date=fields.Date.context_today(self))
 
 
-    def update_prices(self):
+    def _recompute_prices(self):
+        # update_prices()/action_update_prices() de v15 -> _recompute_prices() en v18.
         self.env.context = self.context_manual_rate()
-        return super(SaleOrder, self).update_prices()
+        return super(SaleOrder, self)._recompute_prices()
 
     def update_currency_rate_prices(self):
+        # product_uom_change()/_onchange_discount() de v15 ya no existen: sale.order.line
+        # pasó a precios por @api.depends (_compute_price_unit/_compute_discount). Se
+        # replica acá el mismo patrón que usa el _recompute_prices() nativo de v18.
         self.ensure_one()
-        for line in self._get_update_prices_lines():
-            line.product_uom_change()
-            line.discount = 0  # Force 0 as discount for the cases when _onchange_discount directly returns
-            line._onchange_discount()
+        lines_to_recompute = self._get_update_prices_lines()
+        lines_to_recompute.invalidate_recordset(['pricelist_item_id'])
+        lines_to_recompute.with_context(force_price_recomputation=True)._compute_price_unit()
+        lines_to_recompute.discount = 0.0
+        lines_to_recompute._compute_discount()
         self.show_update_pricelist = False
 
 class l10narCurrencyRate(models.Model):
