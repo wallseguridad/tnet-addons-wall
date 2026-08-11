@@ -8,6 +8,15 @@ class SaleOrderLine(models.Model):
 
     l10n_ar_price_unit_usd = fields.Float(string='Price Unit USD', compute='_compute_l10n_ar_price_unit_usd', store=True, digits=(16, 6))
 
+    def _get_protected_fields(self):
+        # sale (core) bloquea price_unit en líneas de pedidos bloqueados/
+        # confirmados. Wall necesita reprecio por tipo de cambio manual en
+        # confirmados (ver sale_order.py, rama state == 'sale'), así que se
+        # saca price_unit de la lista. A diferencia del bloqueo de
+        # pricelist_id en sale.order (ver sale_order.py write()), este SÍ
+        # tiene un hook pensado para extenderse.
+        return [f for f in super()._get_protected_fields() if f != "price_unit"]
+
     # product_id_change/product_uom_change ya no existen en v18 (sale.order.line
     # pasó a precios por @api.depends, ver _compute_price_unit). Solo inyectaban
     # el contexto de tasa manual antes de recomputar precios; ese contexto ya lo

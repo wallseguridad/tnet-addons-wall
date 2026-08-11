@@ -39,6 +39,11 @@ class SaleOrder(models.Model):
                     (pricelist_id, tuple(sale_orders.ids)),
                 )
                 sale_orders.invalidate_recordset(['pricelist_id'])
+                # El UPDATE crudo no pasa por el ORM, así que currency_id
+                # (compute+store, depends de pricelist_id) queda desactualizado
+                # -- modified() dispara el mismo recompute que haría un write()
+                # normal, en cascada (currency_id, currency_rate, etc.).
+                sale_orders.modified(['pricelist_id'])
             return result
         return super().write(vals)
 
