@@ -23,6 +23,15 @@
                 <xpath expr="//form/sheet/notebook/page[@name='order_lines']/field[@name='order_line']/list/field[@name='price_unit']" position="before">
                     <field name="l10n_ar_price_unit_usd" readonly="1" force_save="1"/>
                 </xpath>
+                <!-- El core deja order_line entero readonly cuando locked=True
+                     (independiente de state). Wall necesita reprecio por TC
+                     manual en confirmados: se saca 'locked' de la condición,
+                     el resto de los campos (qty, producto, etc.) los sigue
+                     protegiendo sale.order.line._get_protected_fields() del
+                     lado del servidor igual. -->
+                <xpath expr="//form/sheet/notebook/page[@name='order_lines']/field[@name='order_line']" position="attributes">
+                    <attribute name="readonly">state == 'cancel'</attribute>
+                </xpath>
             </field>
         </record>
     </data>
