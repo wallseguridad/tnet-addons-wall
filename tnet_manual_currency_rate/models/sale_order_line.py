@@ -19,13 +19,20 @@ class SaleOrderLine(models.Model):
         self.env.context = self.order_id.context_manual_rate()
 
         for line in self:
-            price_usd = line.l10n_ar_price_unit_usd
             if line.order_id.state in ['draft', 'sent']:
                 currency_from = line.order_id.pricelist_id.currency_id
                 if currency_from.name == 'USD':
-                    price_usd =  line.price_unit
+                    price_usd = line.price_unit
                 else:
                     price_usd = currency_from._convert(line.price_unit, self.env.ref('base.USD'), self.company_id,
                                                         date=fields.Date.context_today(self))
-
-            line.l10n_ar_price_unit_usd = price_usd
+                line.l10n_ar_price_unit_usd = price_usd
+            else:
+                # Para confirmados no se recalcula -- se preserva el valor ya
+                # guardado. OJO: leer line.l10n_ar_price_unit_usd acá (self-read
+                # dentro de su propio compute) daba 0.0 en un form nuevo/onchange
+                # (NewId), porque el campo todavía no tiene valor calculado en esa
+                # sesión -- terminaba pisando el precio real con 0 al abrir/editar
+                # un pedido confirmado. line._origin sí expone el valor guardado
+                # real tanto en un record persistido como en uno NewId con origin.
+                line.l10n_ar_price_unit_usd = line._origin.l10n_ar_price_unit_usd
