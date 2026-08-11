@@ -8,6 +8,40 @@ class SaleOrder(models.Model):
 
     l10n_ar_currency_rate_ids = fields.One2many(comodel_name='l10n.ar.currency.rate', inverse_name="sale_order_id", string="Currency Rates")
 
+    def _get_protected_fields(self):
+        # sale_ux (adhoc) bloquea la edición de pricelist_id en pedidos
+        # confirmados/bloqueados. Wall necesita poder editar el tipo de
+        # cambio/lista de precios en confirmados (ver
+        # _onchange_l10n_ar_currency_rates, rama state == 'sale'), así que
+        # se saca de la lista de campos protegidos.
+        return [f for f in super()._get_protected_fields() if f != "pricelist_id"]
+
+    def write(self, vals):
+        # sale (core) bloquea sin excepción escribir pricelist_id si el pedido
+        # está confirmado (write() de addons/sale/models/sale_order.py, no es
+        # un hook pensado para extender). Para los pedidos confirmados se
+        # escribe pricelist_id aparte por SQL directo, y se le saca del vals
+        # antes de llegar al write() del core para el resto de los campos.
+        if 'pricelist_id' in vals and any(o.state == 'sale' for o in self):
+            sale_orders = self.filtered(lambda o: o.state == 'sale')
+            other_orders = self - sale_orders
+            pricelist_id = vals['pricelist_id']
+
+            result = True
+            if other_orders:
+                result = super(SaleOrder, other_orders).write(vals) and result
+            if sale_orders:
+                rest_vals = {k: v for k, v in vals.items() if k != 'pricelist_id'}
+                if rest_vals:
+                    result = super(SaleOrder, sale_orders).write(rest_vals) and result
+                self.env.cr.execute(
+                    "UPDATE sale_order SET pricelist_id = %s WHERE id IN %s",
+                    (pricelist_id, tuple(sale_orders.ids)),
+                )
+                sale_orders.invalidate_recordset(['pricelist_id'])
+            return result
+        return super().write(vals)
+
     def context_manual_rate(self):
         context = dict(self.env.context)
         if self.l10n_ar_currency_rate_ids:
