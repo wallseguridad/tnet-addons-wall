@@ -10,27 +10,16 @@ class PurchaseOrderLine(models.Model):
 
     l10n_ar_price_unit_usd = fields.Float(string='Price Unit USD', compute='_compute_l10n_ar_price_unit_usd', store=True, digits=(16, 6))
 
-    @api.depends('price_unit')
+    @api.depends('price_unit', 'order_id.currency_id')
     def _compute_l10n_ar_price_unit_usd(self):
         for line in self:
-            price_usd = line.l10n_ar_price_unit_usd
-            if line.order_id.state in ['draft', 'sent', 'to approve']:
-                self.env.context = line.order_id.context_manual_rate()
-                currency_order_id = line.order_id.currency_id
-                if currency_order_id.name == 'USD':
-                    price_usd =  line.price_unit
-                else:
-                    price_usd = currency_order_id._convert(line.price_unit, self.env.ref('base.USD'),
-                                                         self.company_id,
-                                                         date=fields.Date.context_today(self))
-
             self.env.context = line.order_id.context_manual_rate()
             currency_order_id = line.order_id.currency_id
             if currency_order_id.name == 'USD':
-                price_usd =  line.price_unit
+                price_usd = line.price_unit
             else:
                 price_usd = currency_order_id._convert(line.price_unit, self.env.ref('base.USD'),
-                                                     self.company_id,
+                                                     line.company_id,
                                                      date=fields.Date.context_today(self))
 
             line.l10n_ar_price_unit_usd = price_usd

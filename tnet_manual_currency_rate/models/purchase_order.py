@@ -27,23 +27,7 @@ class PurchaseOrder(models.Model):
     def _onchange_l10n_ar_currency_rate(self):
         if self.order_line:
             self.env.context = self.context_manual_rate()
-            for line in self.order_line:
-                #if line.order_id.state in ['draft', 'sent', 'to approve']:
-                    #line.l10n_ar_price_unit_usd = self.currency_id._convert(line.price_unit, self.env.ref('base.USD'),
-                                                                            #self.company_id,
-                                                                            #date=fields.Date.context_today(self))
-                line.l10n_ar_price_unit_usd = self.currency_id._convert(line.price_unit, self.env.ref('base.USD'),
-                                                                        self.company_id,
-                                                                        date=fields.Date.context_today(self))
-        #if self.order_line:
-            #self.env.context = self.context_manual_rate()
-            #for line in self.order_line:
-                #if line.order_id.state in ['draft', 'sent', 'to approve']:
-                    #line._onchange_quantity()
-                #else:
-                    #line.price_unit = self.env.ref('base.USD')._convert(line.l10n_ar_price_unit_usd, self.currency_id,
-                                                                        #self.company_id,
-                                                                        #date=fields.Date.context_today(self))
+            self.order_line._compute_l10n_ar_price_unit_usd()
 
     @api.depends('date_order', 'currency_id', 'company_id', 'company_id.currency_id')
     def _compute_currency_rate(self):
@@ -84,17 +68,7 @@ class PurchaseOrder(models.Model):
                                                           'inverse_rate': currency_id.inverse_rate,
                                                           'date': currency_id.date}))
                     self.l10n_ar_currency_rate_ids = currency_rates
-            self._onchange_l10n_ar_currency_rate()
-        elif self.state in ['purchase']:
-            self.env.context = self.context_manual_rate()
-            currency_order_id = self.currency_id
-            for line in self.order_line:
-                if currency_order_id.name == 'USD':
-                    line.price_unit =  line.l10n_ar_price_unit_usd
-                else:
-                    line.price_unit = self.env.ref('base.USD')._convert(line.l10n_ar_price_unit_usd, currency_order_id,
-                                                                        self.company_id,
-                                                                        date=fields.Date.context_today(self))
+
     def _add_supplier_to_product(self):
         self.env.context = self.context_manual_rate()
         return super(PurchaseOrder, self)._add_supplier_to_product()
