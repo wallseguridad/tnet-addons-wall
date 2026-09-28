@@ -2,7 +2,7 @@
 
 {
     'name': "TNET Product Multi Currency",
-    'version': '18.0.0.1.0',
+    'version': '18.0.0.2.0',
     'description': """Product Multi Currency""",
     'summary': "Product Multi Currency",
     'author': 'Luis Trajtenberg',
@@ -12,6 +12,7 @@
     'data': [
         "security/security.xml",
         "security/ir.model.access.csv",
+        "data/ir_cron.xml",
         "views/product_template_views.xml",
         "views/purchase_order_views.xml",
         "views/sale_order_views.xml",

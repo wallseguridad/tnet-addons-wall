@@ -2,7 +2,7 @@
 
 {
     'name': 'TNET Product Profitability',
-    'version': '18.0.2.0.0',
+    'version': '18.0.2.1.0',
     'description': """Calculate profitability from cost for a product""",
     'summary': "Calculate profitability from cost for a product",
     'author' : 'Luis Trajtenberg',

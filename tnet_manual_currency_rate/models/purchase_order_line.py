@@ -99,12 +99,14 @@ class PurchaseOrderLine(models.Model):
 
     def action_update_standard_price(self):
         if self.product_id:
-            self.product_id.standard_price = self.env.ref('base.USD')._convert(self.l10n_ar_price_unit_usd,
-                                                   self.product_id.cost_currency_id,
+            # wall_cost is in the product cost currency; writing it recomputes standard_price in company currency
+            wall_currency = self.product_id.property_cost_currency_id or self.company_id.currency_id
+            self.product_id.wall_cost = self.env.ref('base.USD')._convert(self.l10n_ar_price_unit_usd,
+                                                   wall_currency,
                                                    self.company_id,
                                                    date=fields.Date.context_today(self))
-            if self.product_id.standard_price and not self.product_id.property_profitability_percentage == 0.0:
-                price = self.product_id.standard_price * (1 + self.product_id.property_profitability_percentage / 100)
+            if self.product_id.wall_cost and not self.product_id.property_profitability_percentage == 0.0:
+                price = self.product_id.wall_cost * (1 + self.product_id.property_profitability_percentage / 100)
                 currency_from = self.product_id.property_cost_currency_id if self.product_id.property_cost_currency_id else self.product_id.cost_currency_id
                 currency_to = self.product_id.property_currency_id if self.product_id.property_currency_id else self.product_id.currency_id
                 self.product_id.list_price = currency_from._convert(price, currency_to, self.env.company,

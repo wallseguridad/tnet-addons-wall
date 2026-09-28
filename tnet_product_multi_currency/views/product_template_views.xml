@@ -29,13 +29,18 @@
                           <field name="list_price" class="oe_inline" widget="monetary" options="{'currency_field': 'currency_id', 'field_digits': True}"/>
                           <field name="property_currency_id" class="oe_inline" style="width: 40% !important; margin-left: 5px;" options="{'no_create': True, 'no_edit': True, 'no_open': True}"/>
                         </div>
-                        <label for="standard_price" groups="base.group_user" invisible="product_variant_count &gt; 1 and not is_product_variant"/>
-                        <div name="standard_price_uom" groups="base.group_user" invisible="product_variant_count &gt; 1 and not is_product_variant" class="o_row">
-                            <field name="standard_price" widget="monetary" options="{'currency_field': 'cost_currency_id', 'field_digits': True}"/>
+                        <label for="wall_cost" groups="base.group_user" invisible="product_variant_count &gt; 1 and not is_product_variant"/>
+                        <div name="wall_cost_uom" groups="base.group_user" invisible="product_variant_count &gt; 1 and not is_product_variant" class="o_row">
+                            <field name="wall_cost" widget="monetary" options="{'currency_field': 'property_cost_currency_id', 'field_digits': True}"/>
                             <field name="property_cost_currency_id" class="oe_inline" style="margin-left: 5px;" options="{'no_create': True, 'no_edit': True, 'no_open': True}"/>
                             <span groups="uom.group_uom" class="oe_read_only">
                                 <field name="uom_name"/>
                             </span>
+                        </div>
+                        <label for="standard_price" groups="base.group_user" invisible="product_variant_count &gt; 1 and not is_product_variant"/>
+                        <div name="standard_price_uom" groups="base.group_user" invisible="product_variant_count &gt; 1 and not is_product_variant" class="o_row">
+                            <field name="standard_price" widget="monetary" readonly="wall_cost" options="{'currency_field': 'cost_currency_id', 'field_digits': True}"/>
+                            <field name="cost_currency_id" invisible="1"/>
                         </div>
                     </group>
 				</xpath>
