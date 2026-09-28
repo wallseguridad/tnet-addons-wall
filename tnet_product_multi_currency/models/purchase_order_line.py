@@ -12,8 +12,7 @@ class PurchaseOrderLine(models.Model):
                                   store=True)
     wall_cost = fields.Float(string='Wall Cost',
                              related='product_id.wall_cost',
-                             readonly=True,
-                             store=True)
+                             readonly=True)
     cost_currency_id = fields.Many2one(comodel_name='res.currency',
                                        string='Currency',
                                        related='product_id.property_cost_currency_id',
