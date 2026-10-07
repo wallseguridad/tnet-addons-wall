@@ -39,11 +39,10 @@
                 <span t-field="line.product_id.default_code"/>
             </td>
         </xpath>
-        <xpath expr="//tbody[hasclass('sale_tbody')]//t[@t-foreach='lines_to_report']/t[@t-set='current_subtotal']" position="before">
-            <t t-set="current_name" t-value="line.name.replace('[{}]'.format(line.product_id.default_code),'')"/>
-        </xpath>
-        <xpath expr="//td[@name='td_name']//span" position="replace">
-            <t t-out="current_name"/>
+        <xpath expr="//td[@name='td_name']//span" position="attributes">
+            <attribute name="t-field"/>
+            <attribute name="t-out">line.product_id._get_report_line_text(line.name)</attribute>
+            <attribute name="t-options">{'widget': 'text'}</attribute>
         </xpath>
     </template>
 

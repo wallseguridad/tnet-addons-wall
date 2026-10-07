@@ -71,7 +71,8 @@
             </td>
         </xpath>
         <xpath expr="//td[@name='account_invoice_line_name']//span" position="attributes">
-            <attribute name="t-field">line.product_id.name</attribute>
+            <attribute name="t-field"/>
+            <attribute name="t-out">line.product_id._get_report_line_text(line.name)</attribute>
         </xpath>
     </template>
 
