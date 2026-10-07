@@ -57,6 +57,11 @@
                 <span> %</span>
             </td>
         </xpath>
+        <!-- no se muestra el recuadro de impuestos en moneda de la compañía; se anula el
+             t-if en lugar de eliminarlo para no dejar huérfano el t-else que le sigue -->
+        <xpath expr="//t[@t-call='account.document_tax_totals_company_currency_template']/.." position="attributes">
+            <attribute name="t-if">False</attribute>
+        </xpath>
         <xpath expr="//th[@name='th_description']" position="before">
             <th name="th_code" class="text-start" t-att-style="'display: none;' if without_sku else ''"><span>Código</span></th>
         </xpath>
@@ -102,24 +107,7 @@
     -->
 
     <template id="stock_account_report_invoice_document_inherit" inherit_id="stock_account.stock_account_report_invoice_document">
-        <xpath expr="//table[@name='invoice_snln_table']" position="replace">
-            <table class="table table-sm" style="width: 50%;" name="invoice_snln_table" t-att-style="'display: none;' if without_sku else ''">
-                <thead>
-                    <tr>
-                        <th><span>Producto</span></th>
-                        <th class="text-right"><span>SN/LN</span></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <t t-foreach="lot_values" t-as="snln_line">
-                        <tr>
-                            <td><t t-esc="snln_line['product_name']"/></td>
-                            <td class="text-right"><t t-esc="snln_line['lot_name']"/></td>
-                        </tr>
-                    </t>
-                </tbody>
-            </table>
-        </xpath>
+        <xpath expr="//table[@name='invoice_snln_table']" position="replace"/>
     </template>
 
     <template id="report_accountmove_without_sku">
