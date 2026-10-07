@@ -1,7 +1,7 @@
 {
     'name': 'Wall Reports Custom',
     "author": "GauchoCode",
-    'version': '18.0.0.1.1',
+    'version': '18.0.0.1.2',
     'description': """""",
     "summary" : """""",
     "license" : "LGPL-3",
