@@ -62,6 +62,11 @@
         <xpath expr="//t[@t-call='account.document_tax_totals_company_currency_template']/.." position="attributes">
             <attribute name="t-if">False</attribute>
         </xpath>
+        <!-- línea entre el total y lo pagado, igual a las del bloque de totales; va en la
+             primera fila de pago que se imprime (las de diferencia de cambio se omiten) -->
+        <xpath expr="//i[hasclass('oe_payment_label')]/../.." position="attributes">
+            <attribute name="t-att-class">'border-black' if [p for p in payments_vals if p['is_exchange'] == 0][:1] == [payment_vals] else None</attribute>
+        </xpath>
         <xpath expr="//th[@name='th_description']" position="before">
             <th name="th_code" class="text-start" t-att-style="'display: none;' if without_sku else ''"><span>Código</span></th>
         </xpath>
