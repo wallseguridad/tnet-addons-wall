@@ -120,7 +120,6 @@ def _seccion_1_limpieza_vistas(cr):
         'meli_oerp_stock',
         'odoo_connector_api',
         'account_payment_group',
-        'product_brand',
         'product_profitability_fix',
         'purchase_discount',
         'website_price_tax_custom',
