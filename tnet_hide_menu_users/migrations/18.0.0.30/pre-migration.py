@@ -843,9 +843,13 @@ def _seccion_14_limpiar_group_ids_menus_pagos(cr):
 def _seccion_15_modulos_post_upgrade(cr):
     print("[wall pre-18.0.0.30] === Sección 15: forzar instalación de módulos post-upgrade ===")
 
+    # tnet_manual_currency_rate: la sección 1 lo marca 'uninstalled' para limpiar
+    # el residuo de v15, pero sale_order_currency_rate_inheritance depende de él.
+    # Odoo.sh no corre migrate-update.sh (FORCE_INSTALL), hay que reinstalarlo acá.
     modules_to_install = [
         'wall_sale_compat',
         'l10n_ar_payment_bundle',
+        'tnet_manual_currency_rate',
     ]
 
     cr.execute("""
