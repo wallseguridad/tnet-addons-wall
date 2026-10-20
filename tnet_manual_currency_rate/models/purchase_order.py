@@ -6,7 +6,7 @@ from odoo import api, fields, models, _
 class PurchaseOrder(models.Model):
     _inherit = "purchase.order"
 
-    l10n_ar_currency_rate_ids = fields.One2many(comodel_name='l10n.ar.currency.rate.purchase', inverse_name="purchase_order_id", string="Currency Rates")
+    l10n_ar_currency_rate_ids = fields.One2many(comodel_name='l10n.ar.currency.rate.purchase', inverse_name="purchase_order_id", string="Currency Rates", copy=True)
 
     def context_manual_rate(self):
         context = dict(self.env.context)

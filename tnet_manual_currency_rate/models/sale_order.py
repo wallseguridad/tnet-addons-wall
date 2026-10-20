@@ -6,7 +6,7 @@ from odoo import api, fields, models, _
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
-    l10n_ar_currency_rate_ids = fields.One2many(comodel_name='l10n.ar.currency.rate', inverse_name="sale_order_id", string="Currency Rates")
+    l10n_ar_currency_rate_ids = fields.One2many(comodel_name='l10n.ar.currency.rate', inverse_name="sale_order_id", string="Currency Rates", copy=True)
 
     def _get_protected_fields(self):
         # sale_ux (adhoc) bloquea la edición de pricelist_id en pedidos
