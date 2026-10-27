@@ -2,7 +2,7 @@
 
 {
     'name': "TNET Manual Currency Rate",
-    'version': '18.0.0.1.0',
+    'version': '18.0.0.1.1',
     'description': """Manual Currency Rate in Sale Orders""",
     'summary': "Manual Currency Rate in Sale Orders",
     'author': 'Luis Trajtenberg',
